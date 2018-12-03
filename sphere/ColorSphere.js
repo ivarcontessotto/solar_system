@@ -19,8 +19,8 @@ ColorSphere.prototype = Object.create(SolidSphere.prototype);
 
 ColorSphere.prototype.draw = function(gl, ctx, viewMatrix) {
     gl.uniform1i(ctx.uEnableTextureId, 0);
-    gl.vertexAttrib3f(ctx.aColorId, this.color[0], this.color[1], this.color[2]);
-    gl.disableVertexAttribArray(ctx.aColorId);  // Needs to be disabled for constant value.
+    gl.vertexAttrib3f(ctx.aVertexColorId, this.color[0], this.color[1], this.color[2]);
+    gl.disableVertexAttribArray(ctx.aVertexColorId);  // Needs to be disabled for constant value.
 
     SolidSphere.prototype.draw.call(this, gl, ctx, viewMatrix);
 };

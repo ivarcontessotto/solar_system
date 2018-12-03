@@ -1,38 +1,33 @@
-attribute vec3 aPosition;
+attribute vec3 aVertexPosition;
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 
-attribute vec3 aColor;
-varying vec3 vColor;
+attribute vec3 aVertexColor;
+varying vec3 vFragmentColor;
 
 uniform bool uEnableTexture;
-attribute vec2 aTextureCoordinate;
-varying vec2 vTextureCoordinate;
+attribute vec2 aVertexTextureCoordinate;
+varying vec2 vFragmentTextureCoordinate;
 
 uniform bool uEnableLighting;
-attribute vec3 aNormal;
-uniform mat3 uNormalModelViewMatrix;
-varying vec3 vNormalEye;
-varying vec3 vPositionEye3;
+attribute vec3 aVertexNormal;
+uniform mat3 uNormalMatrix;
+varying vec3 vFragmentPositionEye;
+varying vec3 vFragmentNormalEye;
 
 void main() {
-    // Calculate the vertex position in eye coordinates for fragment shader.
-    vec4 positionEye4 = uModelViewMatrix * vec4(aPosition, 1);
-    // Calculate the projected position.
+    vec4 positionEye4 = uModelViewMatrix * vec4(aVertexPosition, 1);
     gl_Position = uProjectionMatrix * positionEye4;
 
     if (uEnableLighting) {
-        // Calculate cartesian coordinates of current vertex in eye coordinates for fragment shader.
-        vPositionEye3 = positionEye4.xyz / positionEye4.w;
-        // Calculate the normal vector in eye coordinates for fragment shader.
-        vNormalEye = normalize(uNormalModelViewMatrix * aNormal);
+        vFragmentPositionEye = positionEye4.xyz / positionEye4.w;
+        vFragmentNormalEye = normalize(uNormalMatrix * aVertexNormal);
     }
 
-    // Set color or texture coordinates for fragment shader
     if (uEnableTexture) {
-        vTextureCoordinate = aTextureCoordinate;
+        vFragmentTextureCoordinate = aVertexTextureCoordinate;
     }
     else {
-        vColor = aColor;
+        vFragmentColor = aVertexColor;
     }
 }

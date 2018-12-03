@@ -9,14 +9,14 @@
  */
 function SolidSphere(gl, latitudeBands, longitudeBands) {
     const buffers = defineVerticesAndNormals();
-    this.positionBuffer = buffers.positionBuffer;
-    this.normalBuffer = buffers.normalBuffer;
+    this.vertexPositionBuffer = buffers.positionBuffer;
+    this.vertexNormalBuffer = buffers.normalBuffer;
     this.indexBuffer = defineIndices();
     this.numberOfTriangles = latitudeBands * longitudeBands * 2;
     this.modelMatrix = mat4.create();
 
     function defineVerticesAndNormals() {
-        const verticesSlashNormals = [];  // Vertices and normals are identical for this shape.
+        const verticesAndNormals = [];  // Vertices and normals are identical for this shape.
 
         for (let latNumber = 0; latNumber <= latitudeBands; latNumber++) {
             const theta = latNumber * Math.PI / latitudeBands;
@@ -33,18 +33,18 @@ function SolidSphere(gl, latitudeBands, longitudeBands) {
                 const y = cosTheta;
                 const z = sinPhi * sinTheta;
 
-                verticesSlashNormals.push(x);
-                verticesSlashNormals.push(y);
-                verticesSlashNormals.push(z);
+                verticesAndNormals.push(x);
+                verticesAndNormals.push(y);
+                verticesAndNormals.push(z);
             }
         }
         const positionBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesSlashNormals), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesAndNormals), gl.STATIC_DRAW);
 
         const normalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesSlashNormals), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesAndNormals), gl.STATIC_DRAW);
 
         return {
             positionBuffer: positionBuffer,
@@ -106,19 +106,19 @@ SolidSphere.prototype.draw = function(gl, ctx, vieMatrix) {
 
     const normalModelViewMatrix = mat3.create();
     mat3.normalFromMat4(normalModelViewMatrix, modelViewMatrix);
-    gl.uniformMatrix3fv(ctx.uNormalModelViewMatrixId, false, normalModelViewMatrix);
+    gl.uniformMatrix3fv(ctx.uNormalMatrixId, false, normalModelViewMatrix);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-    gl.vertexAttribPointer(ctx.aPositionId, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(ctx.aPositionId);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
+    gl.vertexAttribPointer(ctx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(ctx.aVertexPositionId);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-    gl.vertexAttribPointer(ctx.aNormalId, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(ctx.aNormalId);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
+    gl.vertexAttribPointer(ctx.aVertexNormalId, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(ctx.aVertexNormalId);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     gl.drawElements(gl.TRIANGLES, this.numberOfTriangles * 3 ,gl.UNSIGNED_SHORT, 0);
 
-    gl.disableVertexAttribArray(ctx.aPositionId);
-    gl.disableVertexAttribArray(ctx.aNormalId);
+    gl.disableVertexAttribArray(ctx.aVertexPositionId);
+    gl.disableVertexAttribArray(ctx.aVertexNormalId);
 };

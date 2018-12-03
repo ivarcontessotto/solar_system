@@ -11,17 +11,17 @@ let planet = null;
 let viewMatrix = null;
 const ctx = {
     shaderProgram: null,
-    aPositionId: null,
+    aVertexPositionId: null,
     uModelViewMatrixId: null,
     uProjectionMatrixId: null,
-    aColorId: null,
+    aVertexColorId: null,
     uEnableTextureId: null,
-    aTextureCoordinateId: null,
-    uSamplerId: null,
+    aVertexTextureCoordinateId: null,
+    uTextureId: null,
     uEnableLightingId: null,
-    aNormalId: null,
-    uNormalModelViewMatrixId: null,
-    uLightPositionEye3Id: null,
+    aVertexNormalId: null,
+    uNormalMatrixId: null,
+    uLightPositionEyeId: null,
     uEmissiveLightId: null
 };
 
@@ -63,17 +63,17 @@ function initGL() {
  * Setup all the attribute and uniform variables
  */
 function setUpAttributesAndUniforms(){
-    ctx.aPositionId = gl.getAttribLocation(ctx.shaderProgram, "aPosition");
+    ctx.aVertexPositionId = gl.getAttribLocation(ctx.shaderProgram, "aVertexPosition");
     ctx.uModelViewMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uModelViewMatrix");
     ctx.uProjectionMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMatrix");
-    ctx.aColorId = gl.getAttribLocation(ctx.shaderProgram, "aColor");
+    ctx.aVertexColorId = gl.getAttribLocation(ctx.shaderProgram, "aVertexColor");
     ctx.uEnableTextureId = gl.getUniformLocation(ctx.shaderProgram, "uEnableTexture");
-    ctx.aTextureCoordinateId = gl.getAttribLocation(ctx.shaderProgram, "aTextureCoordinate");
-    ctx.uSamplerId = gl.getUniformLocation(ctx.shaderProgram, "uSampler");
+    ctx.aVertexTextureCoordinateId = gl.getAttribLocation(ctx.shaderProgram, "aVertexTextureCoordinate");
+    ctx.uTextureId = gl.getUniformLocation(ctx.shaderProgram, "uTexture");
     ctx.uEnableLightingId = gl.getUniformLocation(ctx.shaderProgram, "uEnableLighting");
-    ctx.aNormalId = gl.getAttribLocation(ctx.shaderProgram, "aNormal");
-    ctx.uNormalModelViewMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uNormalModelViewMatrix");
-    ctx.uLightPositionEye3Id = gl.getUniformLocation(ctx.shaderProgram, "uLightPositionEye3");
+    ctx.aVertexNormalId = gl.getAttribLocation(ctx.shaderProgram, "aVertexNormal");
+    ctx.uNormalMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uNormalMatrix");
+    ctx.uLightPositionEyeId = gl.getUniformLocation(ctx.shaderProgram, "uLightPositionEye");
     ctx.uLightColorId = gl.getUniformLocation(ctx.shaderProgram, "uLightColor");
     ctx.uEmissiveLightId = gl.getUniformLocation(ctx.shaderProgram, "uEmissiveLight")
 }
@@ -141,7 +141,7 @@ function setUpLighting() {
     const lightPositionEye3 = [lightPositionEye[0] / lightPositionEye[3],
                                  lightPositionEye[1] / lightPositionEye[3],
                                  lightPositionEye[2] / lightPositionEye[3]];
-    gl.uniform3fv(ctx.uLightPositionEye3Id, lightPositionEye3);
+    gl.uniform3fv(ctx.uLightPositionEyeId, lightPositionEye3);
     gl.uniform3fv(ctx.uLightColorId,[1, 0.9, 0.5]);
 }
 
