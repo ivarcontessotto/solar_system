@@ -169,6 +169,9 @@ function setUpLighting() {
  * @param timeStamp
  */
 function startDrawing(timeStamp) {
+    resizeCanvasToDisplaySize(gl.canvas);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
     startTime = timeStamp;
     window.requestAnimationFrame(draw);
 }
