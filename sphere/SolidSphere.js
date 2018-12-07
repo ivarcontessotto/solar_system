@@ -8,51 +8,65 @@
  * @param longitudeBands The number of bands along the longitude direction
  */
 function SolidSphere(gl, latitudeBands, longitudeBands) {
-    const buffers = defineVerticesAndNormals();
-    this.vertexPositionBuffer = buffers.positionBuffer;
-    this.vertexNormalBuffer = buffers.normalBuffer;
-    this.indexBuffer = defineIndices();
+    const buffers = initArrayBuffers();
+    this.vertexPositionBuffer = buffers.vertexPositions;
+    this.vertexNormalBuffer = buffers.vertexNormals;
+    this.textureCoordinateBuffer = buffers.textureCoordinates;
+    this.indexBuffer = initIndexBuffer();
     this.numberOfTriangles = latitudeBands * longitudeBands * 2;
     this.modelMatrix = mat4.create();
 
-    function defineVerticesAndNormals() {
-        const verticesAndNormals = [];  // Vertices and normals are identical for this shape.
+    function initArrayBuffers() {
+        const vertexPositions = [];
+        const vertexNormals  = [];
+        const textureCoordinates = [];
 
-        for (let latNumber = 0; latNumber <= latitudeBands; latNumber++) {
-            const theta = latNumber * Math.PI / latitudeBands;
-            const sinTheta = Math.sin(theta);
-            const cosTheta = Math.cos(theta);
+        const latitudeStep = Math.PI / latitudeBands;
+        const longitudeStep = 2 * Math.PI / longitudeBands;
 
-            for (let longNumber = 0; longNumber <= longitudeBands; longNumber++) {
-                const phi = longNumber * 2 * Math.PI / longitudeBands;
-                const sinPhi = Math.sin(phi);
-                const cosPhi = Math.cos(phi);
+        // Unit sphere with radius = 1
+        for (let i = 0; i <= latitudeBands; i++) {
+            const latitudeAngle = Math.PI / 2 - i * latitudeStep; // starting from PI/2 to -PI/2
+            const y = Math.sin(latitudeAngle);
+            const xz = Math.cos(latitudeAngle);
 
-                // position (and normals as it is a unit sphere)
-                const x = cosPhi * sinTheta;
-                const y = cosTheta;
-                const z = sinPhi * sinTheta;
+            for (let j = 0; j <= longitudeBands; j++) {
+                const longitudeAngle = j * longitudeStep;   // starting form 0 to 2*PI
+                const x = xz * Math.cos(longitudeAngle);
+                const z = xz * Math.sin(longitudeAngle);
 
-                verticesAndNormals.push(x);
-                verticesAndNormals.push(y);
-                verticesAndNormals.push(z);
+                vertexPositions.push(x);
+                vertexPositions.push(y);
+                vertexPositions.push(z);
+
+                vertexNormals.push(x);
+                vertexNormals.push(y);
+                vertexNormals.push(z);
+
+                textureCoordinates.push(j / longitudeBands);
+                textureCoordinates.push(i / latitudeBands);
             }
         }
-        const positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesAndNormals), gl.STATIC_DRAW);
+        const vertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
 
-        const normalBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verticesAndNormals), gl.STATIC_DRAW);
+        const vertexNormalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexNormalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
+
+        const textureCoordinateBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordinateBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
 
         return {
-            positionBuffer: positionBuffer,
-            normalBuffer: normalBuffer
+            vertexPositions: vertexPositionBuffer,
+            vertexNormals: vertexNormalBuffer,
+            textureCoordinates: textureCoordinateBuffer
         };
     }
 
-    function defineIndices() {
+    function initIndexBuffer() {
         const indices = [];
         for (let latNumber = 0; latNumber < latitudeBands; latNumber++) {
             for (let longNumber = 0; longNumber < longitudeBands; longNumber++) {

@@ -94,10 +94,10 @@ function setUpHiddenSurfaceRemoval() {
  * Setup the cube objects to draw.
  */
 function setUpCubeObjects() {
-    sun = new ColorSphere(gl, 6, 6, [1, 1, 1]);
+    sun = new ColorSphere(gl, 20, 20, [1, 1, 1]);
     sun.scale([100, 100, 100]);
 
-    planet = new ColorSphere(gl, 6, 6, [0, 0, 1]);
+    planet = new ColorSphere(gl, 20, 20, [0, 0, 1]);
     planet.scale([50, 50, 50]);
     planet.translate([500, 0, 0])
 }
@@ -133,7 +133,6 @@ function createProjectionMatrix() {
 /**
  * Setup object independent lighting state.
  */
-
 function setUpLighting() {
     gl.uniform1i(ctx.uEnableLightingId, 1);
     const lightPositionEye = vec4.create();
