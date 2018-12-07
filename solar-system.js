@@ -5,7 +5,7 @@ window.onload = startup;
 let startTime = null;
 let radPerSecond = Math.PI/8;
 let gl = null;
-let textureImage = null;
+let textures = null;
 let sun = null;
 let planet = null;
 let viewMatrix = null;
@@ -14,9 +14,7 @@ const ctx = {
     aVertexPositionId: null,
     uModelViewMatrixId: null,
     uProjectionMatrixId: null,
-    aVertexColorId: null,
-    uEnableTextureId: null,
-    aVertexTextureCoordinateId: null,
+    aTextureCoordinateId: null,
     uTextureId: null,
     uEnableLightingId: null,
     aVertexNormalId: null,
@@ -27,12 +25,38 @@ const ctx = {
 
 /**
  * Startup function to be called when the body is loaded.
+ * Loads all the texture images needed.
  */
 function startup() {
-    main();
-    // textureImage = new Image();
-    // textureImage.onload = main;
-    // textureImage.src = "../lena512.png";
+    textures = [
+        { url: "textures/sunmap.jpg", image: null},
+        { url: "textures/earthmap1k.jpg", image: null}
+    ];
+    let imagesToLoad = textures.length;
+
+    const onImageLoad = function() {
+        imagesToLoad--;
+        if (imagesToLoad === 0) {
+            main();
+        }
+    };
+
+    for (let i = 0; i < imagesToLoad; i++) {
+        textures[i].image = loadImage(textures[i].url, onImageLoad);
+    }
+}
+
+/**
+ * Loads a texture image asynchronously.
+ * @param url The url to the image.
+ * @param callback The callback method for when the image is loaded.
+ * @return {*} The image object.
+ */
+function loadImage(url, callback) {
+    const image = new Image();
+    image.onload = callback;
+    image.src = url;
+    return image;
 }
 
 /**
@@ -53,10 +77,11 @@ function initGL() {
     setUpAttributesAndUniforms();
     setUpHiddenSurfaceRemoval();
     gl.clearColor(0, 0, 0, 1);
-    setUpCubeObjects();
+    setUpObjects();
     viewMatrix = createViewMatrix();
     gl.uniformMatrix4fv(ctx.uProjectionMatrixId, false, createProjectionMatrix());
     setUpLighting();
+    console.log(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
 }
 
 /**
@@ -66,16 +91,13 @@ function setUpAttributesAndUniforms(){
     ctx.aVertexPositionId = gl.getAttribLocation(ctx.shaderProgram, "aVertexPosition");
     ctx.uModelViewMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uModelViewMatrix");
     ctx.uProjectionMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMatrix");
-    ctx.aVertexColorId = gl.getAttribLocation(ctx.shaderProgram, "aVertexColor");
-    ctx.uEnableTextureId = gl.getUniformLocation(ctx.shaderProgram, "uEnableTexture");
-    ctx.aVertexTextureCoordinateId = gl.getAttribLocation(ctx.shaderProgram, "aVertexTextureCoordinate");
+    ctx.aTextureCoordinateId = gl.getAttribLocation(ctx.shaderProgram, "aVertexTextureCoordinate");
     ctx.uTextureId = gl.getUniformLocation(ctx.shaderProgram, "uTexture");
     ctx.uEnableLightingId = gl.getUniformLocation(ctx.shaderProgram, "uEnableLighting");
     ctx.aVertexNormalId = gl.getAttribLocation(ctx.shaderProgram, "aVertexNormal");
     ctx.uNormalMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uNormalMatrix");
     ctx.uLightPositionEyeId = gl.getUniformLocation(ctx.shaderProgram, "uLightPositionEye");
     ctx.uLightColorId = gl.getUniformLocation(ctx.shaderProgram, "uLightColor");
-    ctx.uEmissiveLightId = gl.getUniformLocation(ctx.shaderProgram, "uEmissiveLight")
 }
 
 /**
@@ -91,14 +113,14 @@ function setUpHiddenSurfaceRemoval() {
 }
 
 /**
- * Setup the cube objects to draw.
+ * Setup the objects to draw.
  */
-function setUpCubeObjects() {
-    sun = new ColorSphere(gl, 20, 20, [1, 1, 1]);
+function setUpObjects() {
+    sun = new TextureSphere(gl, 20, 20, textures[0].image);
     sun.scale([100, 100, 100]);
 
-    planet = new ColorSphere(gl, 20, 20, [0, 0, 1]);
-    planet.scale([50, 50, 50]);
+    planet = new TextureSphere(gl, 20, 20, textures[1].image);
+    planet.scale([100, 100, 100]);
     planet.translate([500, 0, 0])
 }
 
@@ -134,14 +156,13 @@ function createProjectionMatrix() {
  * Setup object independent lighting state.
  */
 function setUpLighting() {
-    gl.uniform1i(ctx.uEnableLightingId, 1);
     const lightPositionEye = vec4.create();
     vec4.transformMat4(lightPositionEye, [0, 0, 0, 1], viewMatrix);
     const lightPositionEye3 = [lightPositionEye[0] / lightPositionEye[3],
                                  lightPositionEye[1] / lightPositionEye[3],
                                  lightPositionEye[2] / lightPositionEye[3]];
     gl.uniform3fv(ctx.uLightPositionEyeId, lightPositionEye3);
-    gl.uniform3fv(ctx.uLightColorId,[1, 0.9, 0.5]);
+    gl.uniform3fv(ctx.uLightColorId,[1, 0.95, 0.8]);
 }
 
 /**
@@ -160,12 +181,18 @@ function startDrawing(timeStamp) {
 function draw(timeStamp) {
     const runtime = timeStamp - startTime;
 
+    // Model transformation
+    // todo calculate the translation vector dynamically. doesnt work if planet rotates around sun
+    planet.translate([-500, 0, 0]);
     planet.rotate(seconds(runtime) * radPerSecond, [0, 1, 0]);
+    planet.translate([500, 0, 0]);
+    //planet.rotate(seconds(runtime) * radPerSecond, [0, 1, 0]);
 
+    // Draw the scene
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.uniform3fv(ctx.uEmissiveLightId, [1, 1, 1]);
+    gl.uniform1i(ctx.uEnableLightingId, 0); // The sun represents the light, so no lighting enabled  for it.
     sun.draw(gl, ctx, viewMatrix);
-    gl.uniform3fv(ctx.uEmissiveLightId, [0, 0, 0]);
+    gl.uniform1i(ctx.uEnableLightingId, 1);
     planet.draw(gl, ctx, viewMatrix);
 
     startTime = timeStamp;

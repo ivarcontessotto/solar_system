@@ -1,15 +1,11 @@
 precision mediump float;
 
-varying vec3 vFragmentColor;
-
-uniform bool uEnableTexture;
 varying vec2 vFragmentTextureCoordinate;
 uniform sampler2D uTexture;
 
 uniform bool uEnableLighting;
 uniform vec3 uLightPositionEye;
 uniform vec3 uLightColor;
-uniform vec3 uEmissiveLight;
 varying vec3 vFragmentPositionEye;
 varying vec3 vFragmentNormalEye;
 const float ambientFactor = 0.2;
@@ -17,13 +13,7 @@ const float shininess = 10.0;
 const vec3 specularMaterialColor = vec3(0.6, 0.6, 0.6);
 
 void main() {
-    vec3 baseColor;
-    if (uEnableTexture) {
-        baseColor = texture2D(uTexture, vFragmentTextureCoordinate).rgb;
-    }
-    else {
-        baseColor = vFragmentColor;
-    }
+    vec3 baseColor = texture2D(uTexture, vFragmentTextureCoordinate).rgb;
 
     if (uEnableLighting) {
         vec3 lightDirection = normalize(uLightPositionEye - vFragmentPositionEye);
@@ -45,7 +35,7 @@ void main() {
             specularColor = specularFactor * uLightColor * specularMaterialColor;
         }
 
-        gl_FragColor = vec4(ambientColor + diffuseColor + specularColor + uEmissiveLight, 1);
+        gl_FragColor = vec4(ambientColor + diffuseColor + specularColor, 1);
     }
     else {
         gl_FragColor = vec4(baseColor, 1);
