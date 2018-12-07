@@ -81,7 +81,6 @@ function initGL() {
     viewMatrix = createViewMatrix();
     gl.uniformMatrix4fv(ctx.uProjectionMatrixId, false, createProjectionMatrix());
     setUpLighting();
-    console.log(gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS));
 }
 
 /**
@@ -182,11 +181,8 @@ function draw(timeStamp) {
     const runtime = timeStamp - startTime;
 
     // Model transformation
-    // todo calculate the translation vector dynamically. doesnt work if planet rotates around sun
-    planet.translate([-500, 0, 0]);
+    planet.rotateInOrigin(seconds(runtime) * radPerSecond, [0, 1, 0]);
     planet.rotate(seconds(runtime) * radPerSecond, [0, 1, 0]);
-    planet.translate([500, 0, 0]);
-    //planet.rotate(seconds(runtime) * radPerSecond, [0, 1, 0]);
 
     // Draw the scene
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -206,4 +202,8 @@ function draw(timeStamp) {
  */
 function seconds(runtime) {
     return runtime / 1000;
+}
+
+function calculateTranslationVector() {
+
 }

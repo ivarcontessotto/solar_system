@@ -129,6 +129,28 @@ TextureSphere.prototype.translate = function(translationVector) {
     this.modelMatrix = newModelMatrix;
 };
 
+TextureSphere.prototype.rotateInOrigin = function(angle, axis) {
+    // Calculate the translation vectors from the current position to origin and back.
+    const translationFromOrigin4 = vec4.create();
+    const origin = vec4.fromValues(0, 0, 0, 1);
+    vec4.transformMat4(translationFromOrigin4, origin, this.modelMatrix);
+    const translationFromOrigin3 = [
+        translationFromOrigin4[0] / translationFromOrigin4[3],
+        translationFromOrigin4[1] / translationFromOrigin4[3],
+        translationFromOrigin4[2] / translationFromOrigin4[3],
+    ];
+    const translationToOrigin3 = [
+        translationFromOrigin3[0] * (-1),
+        translationFromOrigin3[1] * (-1),
+        translationFromOrigin3[2] * (-1)
+    ];
+
+    // Perform rotation in origin
+    this.translate(translationToOrigin3);
+    this.rotate(angle, axis);
+    this.translate(translationFromOrigin3);
+};
+
 TextureSphere.prototype.draw = function(gl, ctx, vieMatrix) {
     const modelViewMatrix = mat4.create();
     mat4.multiply(modelViewMatrix, vieMatrix, this.modelMatrix);
