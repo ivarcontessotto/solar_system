@@ -3,7 +3,7 @@ precision mediump float;
 varying vec2 vFragmentTextureCoordinate;
 uniform sampler2D uTexture;
 
-uniform bool uEnableLighting;
+uniform bool uEnableShading;
 uniform vec3 uLightPositionEye;
 uniform vec3 uLightColor;
 varying vec3 vFragmentPositionEye;
@@ -15,7 +15,7 @@ const vec3 specularMaterialColor = vec3(0.6, 0.6, 0.6);
 void main() {
     vec3 baseColor = texture2D(uTexture, vFragmentTextureCoordinate).rgb;
 
-    if (uEnableLighting) {
+    if (uEnableShading) {
         vec3 lightDirection = normalize(uLightPositionEye - vFragmentPositionEye);
         vec3 normal = normalize(vFragmentNormalEye);
 

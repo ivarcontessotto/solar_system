@@ -5,7 +5,7 @@ uniform mat4 uProjectionMatrix;
 attribute vec2 aVertexTextureCoordinate;
 varying vec2 vFragmentTextureCoordinate;
 
-uniform bool uEnableLighting;
+uniform bool uEnableShading;
 attribute vec3 aVertexNormal;
 uniform mat3 uNormalMatrix;
 varying vec3 vFragmentPositionEye;
@@ -17,7 +17,7 @@ void main() {
 
     vFragmentTextureCoordinate = aVertexTextureCoordinate;
 
-    if (uEnableLighting) {
+    if (uEnableShading) {
         vFragmentPositionEye = positionEye4.xyz / positionEye4.w;
         vFragmentNormalEye = normalize(uNormalMatrix * aVertexNormal);
     }

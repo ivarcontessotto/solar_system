@@ -7,8 +7,9 @@
  * @param sectorCount The number of bands along the longitude direction
  * @param stackCount The number of bands along the latitude direction
  * @param textureImage The image to use as texture
+ * @param enableShading A boolean indicating, whether shading effects should be rendered for this object.
  */
-function TextureSphere(gl, sectorCount, stackCount, textureImage) {
+function TextureSphere(gl, sectorCount, stackCount, textureImage, enableShading) {
     const buffers = initArrayBuffers();
     this.vertexPositionBuffer = buffers.vertexPositions;
     this.vertexNormalBuffer = buffers.vertexNormals;
@@ -17,6 +18,7 @@ function TextureSphere(gl, sectorCount, stackCount, textureImage) {
     this.numberOfTriangles = (stackCount - 1) * sectorCount * 2;
     this.texture = initTexture();
     this.modelMatrix = mat4.create();
+    this.enbaleShading = enableShading;
 
     function initArrayBuffers() {
         const vertexPositions = [];
@@ -96,7 +98,6 @@ function TextureSphere(gl, sectorCount, stackCount, textureImage) {
     function initTexture() {
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
-        //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
@@ -152,21 +153,13 @@ TextureSphere.prototype.rotateInOrigin = function(angle, axis) {
 };
 
 TextureSphere.prototype.draw = function(gl, ctx, vieMatrix) {
-    const modelViewMatrix = mat4.create();
-    mat4.multiply(modelViewMatrix, vieMatrix, this.modelMatrix);
-    gl.uniformMatrix4fv(ctx.uModelViewMatrixId, false, modelViewMatrix);
-
-    const normalModelViewMatrix = mat3.create();
-    mat3.normalFromMat4(normalModelViewMatrix, modelViewMatrix);
-    gl.uniformMatrix3fv(ctx.uNormalMatrixId, false, normalModelViewMatrix);
-
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     gl.vertexAttribPointer(ctx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(ctx.aVertexPositionId);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
-    gl.vertexAttribPointer(ctx.aVertexNormalId, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(ctx.aVertexNormalId);
+    const modelViewMatrix = mat4.create();
+    mat4.multiply(modelViewMatrix, vieMatrix, this.modelMatrix);
+    gl.uniformMatrix4fv(ctx.uModelViewMatrixId, false, modelViewMatrix);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordinateBuffer);
     gl.vertexAttribPointer(ctx.aTextureCoordinateId, 2, gl.FLOAT, false, 0, 0);
@@ -176,10 +169,25 @@ TextureSphere.prototype.draw = function(gl, ctx, vieMatrix) {
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.uniform1i(ctx.uTextureId, 0);
 
+    if (this.enbaleShading) {
+        gl.uniform1i(ctx.uEnableShadingId, 1);
+
+        const normalModelViewMatrix = mat3.create();
+        mat3.normalFromMat4(normalModelViewMatrix, modelViewMatrix);
+        gl.uniformMatrix3fv(ctx.uNormalMatrixId, false, normalModelViewMatrix);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
+        gl.vertexAttribPointer(ctx.aVertexNormalId, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(ctx.aVertexNormalId);
+    }
+    else {
+        gl.uniform1i(ctx.uEnableShadingId, 0);
+    }
+
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     gl.drawElements(gl.TRIANGLES, this.numberOfTriangles * 3 ,gl.UNSIGNED_SHORT, 0);
 
     gl.disableVertexAttribArray(ctx.aVertexPositionId);
-    gl.disableVertexAttribArray(ctx.aVertexNormalId);
     gl.disableVertexAttribArray(ctx.aTextureCoordinateId);
+    gl.disableVertexAttribArray(ctx.aVertexNormalId);
 };

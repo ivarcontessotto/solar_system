@@ -16,11 +16,10 @@ const ctx = {
     uProjectionMatrixId: null,
     aTextureCoordinateId: null,
     uTextureId: null,
-    uEnableLightingId: null,
+    uEnableShadingId: null,
     aVertexNormalId: null,
     uNormalMatrixId: null,
-    uLightPositionEyeId: null,
-    uEmissiveLightId: null
+    uLightPositionEyeId: null
 };
 
 /**
@@ -92,7 +91,7 @@ function setUpAttributesAndUniforms(){
     ctx.uProjectionMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMatrix");
     ctx.aTextureCoordinateId = gl.getAttribLocation(ctx.shaderProgram, "aVertexTextureCoordinate");
     ctx.uTextureId = gl.getUniformLocation(ctx.shaderProgram, "uTexture");
-    ctx.uEnableLightingId = gl.getUniformLocation(ctx.shaderProgram, "uEnableLighting");
+    ctx.uEnableShadingId = gl.getUniformLocation(ctx.shaderProgram, "uEnableShading");
     ctx.aVertexNormalId = gl.getAttribLocation(ctx.shaderProgram, "aVertexNormal");
     ctx.uNormalMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uNormalMatrix");
     ctx.uLightPositionEyeId = gl.getUniformLocation(ctx.shaderProgram, "uLightPositionEye");
@@ -115,10 +114,10 @@ function setUpHiddenSurfaceRemoval() {
  * Setup the objects to draw.
  */
 function setUpObjects() {
-    sun = new TextureSphere(gl, 20, 20, textures[0].image);
+    sun = new TextureSphere(gl, 20, 20, textures[0].image, false);
     sun.scale([100, 100, 100]);
 
-    planet = new TextureSphere(gl, 20, 20, textures[1].image);
+    planet = new TextureSphere(gl, 20, 20, textures[1].image, true);
     planet.scale([100, 100, 100]);
     planet.translate([500, 0, 0])
 }
@@ -183,15 +182,13 @@ function startDrawing(timeStamp) {
 function draw(timeStamp) {
     const runtime = timeStamp - startTime;
 
-    // Model transformation
+    // Model transformations
     planet.rotateInOrigin(seconds(runtime) * radPerSecond, [0, 1, 0]);
     planet.rotate(seconds(runtime) * radPerSecond, [0, 1, 0]);
 
     // Draw the scene
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.uniform1i(ctx.uEnableLightingId, 0); // The sun represents the light, so no lighting enabled  for it.
     sun.draw(gl, ctx, viewMatrix);
-    gl.uniform1i(ctx.uEnableLightingId, 1);
     planet.draw(gl, ctx, viewMatrix);
 
     startTime = timeStamp;
@@ -205,8 +202,4 @@ function draw(timeStamp) {
  */
 function seconds(runtime) {
     return runtime / 1000;
-}
-
-function calculateTranslationVector() {
-
 }
