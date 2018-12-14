@@ -72,16 +72,12 @@ function View(canvas, model, callback) {
     loadTextureImages();
 }
 
-View.prototype.draw = function(timeStamp) {
-    // todo in controller
-    // Model transformations
-    sun.rotateAroundOwnAxis(seconds(runtime) * Math.PI / 64, [0, 1, 0]);
-    planet.rotateInOrigin(seconds(runtime) * Math.PI / 8, [0, 1, 0]);
-    planet.rotateAroundOwnAxis(seconds(runtime) * Math.PI / 16, [0, 1, 0]);
+View.prototype.draw = function() {
+    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    // todo get matrices from model and pass to sphere draw
+    // todo use the sphere viewmodel for it
+    const sunModelMatrix = this.model.sun.modelMatrix;
+    const earthModelMatrix = this.model.earth.modelMatrix;
 
-    // todo here
-    // Draw the scene
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    sun.draw(gl, ctx, viewMatrix);
-    planet.draw(gl, ctx, viewMatrix);
+
 };

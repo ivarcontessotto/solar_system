@@ -1,11 +1,12 @@
 "use strict";
 
-function SolarSystemBody(radius, rotationSpeed, parentBody, relPositionFromParent, orbitalSpeed) {
-    this.parentBody = parentBody;
+function SolarSystemBody(radius, rotationSpeed, rotationAxis, parentBody, relPositionFromParent, orbitalSpeed, orbitalAxis) {
     this.roationSpeed = rotationSpeed;
-    // todo rotation axis
-    this.orbitalSpeed = orbitalSpeed;
+    this.rotationAxis = rotationSpeed;
+    this.parentBody = parentBody;
     this.position = calculatePosition(this.parentBody, relPositionFromParent);
+    this.orbitalSpeed = orbitalSpeed;
+    this.orbitalAxis = orbitalAxis;
     this.modelMatrix = createModelMatrix(radius, this.position);
 
     function calculatePosition(parentBody, relPositionFromParent) {
@@ -26,48 +27,25 @@ function SolarSystemBody(radius, rotationSpeed, parentBody, relPositionFromParen
 }
 
 SolarSystemBody.prototype.rotateAroundOwnAxis = function(seconds) {
-    // todo calculate translation vector from current pos to origin and back
-    // todo perform translation rotation translation
+    const angle = this.roationSpeed * seconds;
+    if (angle <= 0) {
+        return;
+    }
+
+    // Calculate the translation vectors from the current position to origin and back.
+    const origin = vec4.fromValues(0, 0, 0, 1);
+    const translationFromOrigin4 = vec4MultiplyMat4(origin, this.modelMatrix);
+    const translationFromOrigin3 = vec3CartesianFromHomogeneous(translationFromOrigin4);
+    const translationToOrigin3 = vec3MultiplyScalar(translationFromOrigin3, -1);
+
+    // Perform rotation in origin
+    this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, translationToOrigin3);
+    this.modelMatrix = mat4RotatePreMul(this.modelMatrix, angle, this.rotationAxis);
+    this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, translationFromOrigin3);
 };
 
 SolarSystemBody.prototype.orbit = function (seconds) {
-    const angle;
-    const axis;
-    this.modelMatrix = mat4.multiply(mat4.create(), mat4.fromRotation(mat4.create(), angle, axis), this.modelMatrix);
+    // todo orbital axis needs to be updated to be updated according to parent position!
+    const angle = this.orbitalSpeed * seconds;
+    this.modelMatrix = mat4RotatePreMul(this.modelMatrix, angle, this.orbitalAxis);
 };
-
-// todo use this for orbit
-TextureSphere.prototype.rotateInOrigin = function(angle, axis) {
-    // Calculate the translation vectors from the current position to origin and back.
-    const translationFromOrigin4 = vec4.create();
-    const origin = vec4.fromValues(0, 0, 0, 1);
-    vec4.transformMat4(translationFromOrigin4, origin, this.modelMatrix);
-    const translationFromOrigin3 = [
-        translationFromOrigin4[0] / translationFromOrigin4[3],
-        translationFromOrigin4[1] / translationFromOrigin4[3],
-        translationFromOrigin4[2] / translationFromOrigin4[3],
-    ];
-    const translationToOrigin3 = [
-        translationFromOrigin3[0] * (-1),
-        translationFromOrigin3[1] * (-1),
-        translationFromOrigin3[2] * (-1)
-    ];
-
-    // Perform rotation in origin
-    this.modelMatrix =
-        mat4Translate(translationToOrigin3,
-            mat4Rotate(angle, axis,
-                mat4Translate(translationFromOrigin3,
-                    this.modelMatrix)
-        )
-    )
-};
-
-// todo use those
-// function mat4TranslatePreMultiply(matrix, translationVector) {
-//     return matrix.multiply(matrix.create(), matrix.fromTranslation(matrix.create(), translationVector), matrix);
-// }
-//
-// function mat4RotatePreMultiply(matrix, angleRadians, axisVector) {
-//     return mat4.multiply(mat4.create(), mat4.fromRotation(mat4.create(), angleRadians, axisVector), matrix);
-// }

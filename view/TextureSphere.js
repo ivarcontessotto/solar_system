@@ -6,12 +6,9 @@
  * @param gl The webgl context
  * @param sectorCount The number of bands along the longitude direction
  * @param stackCount The number of bands along the latitude direction
- * @param textureImage The image to use as texture
- * @param enableShading A boolean indicating, whether shading effects should be rendered for this object.
  */
-function TextureSphere(gl, sectorCount, stackCount, textureImage, enableShading) {
+function TextureSphere(gl, sectorCount, stackCount) {
 
-    // todo cleanup
     const initArrayBuffers = () => {
         const vertexPositions = [];
         const vertexNormals  = [];
@@ -88,6 +85,7 @@ function TextureSphere(gl, sectorCount, stackCount, textureImage, enableShading)
         return buffer;
     };
 
+    // todo move this out to view.
     const initTexture = () => {
         const texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -98,67 +96,16 @@ function TextureSphere(gl, sectorCount, stackCount, textureImage, enableShading)
         return texture;
     };
 
-    // todo cleanup
     const buffers = initArrayBuffers();
     this.vertexPositionBuffer = buffers.vertexPositions;
     this.vertexNormalBuffer = buffers.vertexNormals;
     this.textureCoordinateBuffer = buffers.textureCoordinates;
     this.indexBuffer = initIndexBuffer();
     this.numberOfTriangles = (stackCount - 1) * sectorCount * 2;
-    this.texture = initTexture();
-    this.modelMatrix = mat4.create();
-    this.enbaleShading = enableShading;
 }
 
 // todo cleanup
-// TextureSphere.prototype.scale = function(scalingVector) {
-//     const scalingMatrix = mat4.create();
-//     mat4.fromScaling(scalingMatrix, scalingVector);
-//     const newModelMatrix = mat4.create();
-//     mat4.multiply(newModelMatrix, scalingMatrix, this.modelMatrix);
-//     this.modelMatrix = newModelMatrix;
-// };
-//
-// TextureSphere.prototype.rotateAroundOwnAxis = function(angle, axis) {
-//     const rotationMatrix = mat4.create();
-//     mat4.fromRotation(rotationMatrix, angle, axis);
-//     const newModelMatrix = mat4.create();
-//     mat4.multiply(newModelMatrix, rotationMatrix, this.modelMatrix);
-//     this.modelMatrix = newModelMatrix;
-// };
-//
-// TextureSphere.prototype.translate = function(translationVector) {
-//     const translationMatrix = mat4.create();
-//     mat4.fromTranslation(translationMatrix, translationVector);
-//     const newModelMatrix = mat4.create();
-//     mat4.multiply(newModelMatrix, translationMatrix, this.modelMatrix);
-//     this.modelMatrix = newModelMatrix;
-// };
-//
-// TextureSphere.prototype.rotateInOrigin = function(angle, axis) {
-//     // Calculate the translation vectors from the current position to origin and back.
-//     const translationFromOrigin4 = vec4.create();
-//     const origin = vec4.fromValues(0, 0, 0, 1);
-//     vec4.transformMat4(translationFromOrigin4, origin, this.modelMatrix);
-//     const translationFromOrigin3 = [
-//         translationFromOrigin4[0] / translationFromOrigin4[3],
-//         translationFromOrigin4[1] / translationFromOrigin4[3],
-//         translationFromOrigin4[2] / translationFromOrigin4[3],
-//     ];
-//     const translationToOrigin3 = [
-//         translationFromOrigin3[0] * (-1),
-//         translationFromOrigin3[1] * (-1),
-//         translationFromOrigin3[2] * (-1)
-//     ];
-//
-//     // Perform rotation in origin
-//     this.translate(translationToOrigin3);
-//     this.rotateAroundOwnAxis(angle, axis);
-//     this.translate(translationFromOrigin3);
-// };
-
-// todo cleanup
-TextureSphere.prototype.draw = function(gl, ctx, vieMatrix) {
+TextureSphere.prototype.draw = function(gl, ctx, modelMatrix, vieMatrix, texture, enableShading) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     gl.vertexAttribPointer(ctx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(ctx.aVertexPositionId);
