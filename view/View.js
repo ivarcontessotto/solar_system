@@ -31,53 +31,67 @@ function View(canvas, model, callback) {
         this.gl.uniformMatrix4fv(this.shaderCtx.uProjectionMatrixId, false, this.model.projectionMatrix);
     };
 
-    const setUpLighting = () => {
+    const setUpLights = () => {
         this.gl.uniform3fv(this.shaderCtx.uLightPositionEyeId, this.model.lightPositionEye);
         this.gl.uniform3fv(this.shaderCtx.uLightColorId,[1, 0.95, 0.8]);
     };
 
-    const loadTextureImages = () => {
-        this.textureImages = [];
-        this.textureImages.push({url: "view/textures/2k_sun.jpg", image: null});
-        this.textureImages.push({url: "view/textures/2k_earth_daymap.jpg", image: null});
-        let imagesToLoad = this.textureImages.length;
+    const createTexture = (item, index) => {
+        item.texture = this.gl.createTexture();
+        this.gl.bindTexture(this.gl.TEXTURE_2D, item.texture);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, item.image);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+    };
 
-        const onImageLoad = () => {
-            imagesToLoad--;
-            if (imagesToLoad === 0) {
-                callback();
-            }
-        };
+    const bindTextures = () => {
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureItems[0].texture);
 
-        for (let i = 0; i < imagesToLoad; i++) {
-            this.textureImages[i].image = loadImage(this.textureImages[i].url, onImageLoad);
+        this.gl.activeTexture(this.gl.TEXTURE1);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureItems[1].texture);
+    };
+
+    let imagesToLoad = 0;
+
+    const onImageLoad = () => {
+        imagesToLoad--;
+        if (imagesToLoad === 0) {
+            this.textureItems.forEach(createTexture);
+            bindTextures();
+            callback();
         }
     };
 
-    const loadImage = (url, callback) => {
-        const image = new Image();
-        image.onload = callback;
-        image.src = url;
-        return image;
+    const loadImage = (item, index) => {
+        item.image = new Image();
+        item.image.onload = onImageLoad;
+        item.image.src = item.url;
     };
 
-    // Initialize Object
+    const loadTextureImages = () => {
+        this.textureItems = [];
+        this.textureItems.push({url: "images/2k_sun.jpg"});
+        this.textureItems.push({url: "images/2k_earth_daymap.jpg"});
+        imagesToLoad = this.textureItems.length;
+        this.textureItems.forEach(loadImage);
+    };
+
     this.gl = createGLContext(canvas);
     this.model = model;
+    this.textureSphere = new TextureSphere(this.gl, 20, 20);
     setUpShaderProgram();
     setUpHiddenSurfaceRemoval();
     setUpProjectionMatrix();
-    setUpLighting();
+    setUpLights();
+    this.gl.clearColor(0, 0, 0, 1);
     // This needs to be done last because images are loaded asynchronously in browser!
     loadTextureImages();
 }
 
 View.prototype.draw = function() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    // todo get matrices from model and pass to sphere draw
-    // todo use the sphere viewmodel for it
-    const sunModelMatrix = this.model.sun.modelMatrix;
-    const earthModelMatrix = this.model.earth.modelMatrix;
-
-
+    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.viewMatrix, 0, false);
+    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.viewMatrix, 1, true);
 };

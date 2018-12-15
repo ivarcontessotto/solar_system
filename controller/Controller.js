@@ -9,21 +9,22 @@ function Controller(model, view) {
 
 Controller.prototype.run = function() {
 
+    const seconds = (runtime) => runtime / 1000;
+
     const startAnimation = (timeStamp) => {
         this.startTime = timeStamp;
         window.requestAnimationFrame(animateFrame);
     };
 
-    const seconds = (runtime) => runtime / 1000;
-
     const animateFrame = (timeStamp) => {
-        const runtime = timeStamp - this.startTime;
+        const runtime = seconds(timeStamp - this.startTime);
         // todo maybe have one function on the model itself which then calls each planet...
         // Update the model transformations
-        this.model.sun.rotateAroundOwnAxis(seconds(runtime));
-        this.model.earth.orbit(seconds(runtime));
-        this.model.earth.rotateAroundOwnAxis(seconds(runtime));
-        // todo draw model
+        this.model.sun.orbit(runtime);
+        this.model.sun.rotateAroundOwnAxis(runtime);
+        this.model.earth.orbit(runtime);
+        this.model.earth.rotateAroundOwnAxis(runtime);
+
         // Draw the scene
         this.view.draw();
 

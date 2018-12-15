@@ -2,7 +2,7 @@
 
 // let startTime = null;
 // let gl = null;
-// let textures = null;
+// let textureItems = null;
 // let sun = null;
 // let planet = null;
 // let viewMatrix = null;
@@ -20,11 +20,11 @@
 // };
 
 // function startup() {
-//     textures = [
-//         { url: "view/textures/2k_sun.jpg", image: null},
-//         { url: "view/textures/2k_earth_daymap.jpg", image: null}
+//     textureItems = [
+//         { url: "view/textureItems/2k_sun.jpg", image: null},
+//         { url: "view/textureItems/2k_earth_daymap.jpg", image: null}
 //     ];
-//     let imagesToLoad = textures.length;
+//     let imagesToLoad = textureItems.length;
 //
 //     const onImageLoad = function() {
 //         imagesToLoad--;
@@ -34,7 +34,7 @@
 //     };
 //
 //     for (let i = 0; i < imagesToLoad; i++) {
-//         textures[i].image = loadImage(textures[i].url, onImageLoad);
+//         textureItems[i].image = loadImage(textureItems[i].url, onImageLoad);
 //     }
 // }
 
@@ -87,10 +87,10 @@
 // }
 
 // function setUpObjects() {
-//     sun = new TextureSphere(gl, 20, 20, textures[0].image, false);
+//     sun = new TextureSphere(gl, 20, 20, textureItems[0].image, false);
 //     sun.scale([100, 100, 100]);
 //
-//     planet = new TextureSphere(gl, 20, 20, textures[1].image, true);
+//     planet = new TextureSphere(gl, 20, 20, textureItems[1].image, true);
 //     planet.scale([100, 100, 100]);
 //     planet.translate([500, 0, 0])
 // }

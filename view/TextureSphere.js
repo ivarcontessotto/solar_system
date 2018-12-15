@@ -59,7 +59,6 @@ function TextureSphere(gl, sectorCount, stackCount) {
         };
     };
 
-    // todo cleanup
     const initIndexBuffer = () => {
         const indices = [];
         for (let i = 0; i < stackCount; i++) {
@@ -85,17 +84,6 @@ function TextureSphere(gl, sectorCount, stackCount) {
         return buffer;
     };
 
-    // todo move this out to view.
-    const initTexture = () => {
-        const texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-        gl.generateMipmap(gl.TEXTURE_2D);
-        return texture;
-    };
-
     const buffers = initArrayBuffers();
     this.vertexPositionBuffer = buffers.vertexPositions;
     this.vertexNormalBuffer = buffers.vertexNormals;
@@ -104,43 +92,37 @@ function TextureSphere(gl, sectorCount, stackCount) {
     this.numberOfTriangles = (stackCount - 1) * sectorCount * 2;
 }
 
-// todo cleanup
-TextureSphere.prototype.draw = function(gl, ctx, modelMatrix, vieMatrix, texture, enableShading) {
+TextureSphere.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, textureId, enableShading) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-    gl.vertexAttribPointer(ctx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(ctx.aVertexPositionId);
+    gl.vertexAttribPointer(shaderCtx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(shaderCtx.aVertexPositionId);
 
-    const modelViewMatrix = mat4.create();
-    mat4.multiply(modelViewMatrix, vieMatrix, this.modelMatrix);
-    gl.uniformMatrix4fv(ctx.uModelViewMatrixId, false, modelViewMatrix);
+    const modelViewMatrix = mat4Multiply(vieMatrix, modelMatrix);
+    gl.uniformMatrix4fv(shaderCtx.uModelViewMatrixId, false, modelViewMatrix);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordinateBuffer);
-    gl.vertexAttribPointer(ctx.aTextureCoordinateId, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(ctx.aTextureCoordinateId);
+    gl.vertexAttribPointer(shaderCtx.aTextureCoordinateId, 2, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(shaderCtx.aTextureCoordinateId);
 
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    gl.uniform1i(ctx.uTextureId, 0);
+    gl.uniform1i(shaderCtx.uTextureId, textureId);
 
-    if (this.enbaleShading) {
-        gl.uniform1i(ctx.uEnableShadingId, 1);
+    if (enableShading) {
+        gl.uniform1i(shaderCtx.uEnableShadingId, 1);
 
-        const normalModelViewMatrix = mat3.create();
-        mat3.normalFromMat4(normalModelViewMatrix, modelViewMatrix);
-        gl.uniformMatrix3fv(ctx.uNormalMatrixId, false, normalModelViewMatrix);
+        gl.uniformMatrix3fv(shaderCtx.uNormalMatrixId, false, mat3NormalMatrixFromMat4(modelViewMatrix));
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
-        gl.vertexAttribPointer(ctx.aVertexNormalId, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(ctx.aVertexNormalId);
+        gl.vertexAttribPointer(shaderCtx.aVertexNormalId, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(shaderCtx.aVertexNormalId);
     }
     else {
-        gl.uniform1i(ctx.uEnableShadingId, 0);
+        gl.uniform1i(shaderCtx.uEnableShadingId, 0);
     }
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
     gl.drawElements(gl.TRIANGLES, this.numberOfTriangles * 3 ,gl.UNSIGNED_SHORT, 0);
 
-    gl.disableVertexAttribArray(ctx.aVertexPositionId);
-    gl.disableVertexAttribArray(ctx.aTextureCoordinateId);
-    gl.disableVertexAttribArray(ctx.aVertexNormalId);
+    gl.disableVertexAttribArray(shaderCtx.aVertexPositionId);
+    gl.disableVertexAttribArray(shaderCtx.aTextureCoordinateId);
+    gl.disableVertexAttribArray(shaderCtx.aVertexNormalId);
 };
