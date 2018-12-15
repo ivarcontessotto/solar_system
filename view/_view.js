@@ -12,7 +12,7 @@
 //     uModelViewMatrixId: null,
 //     uProjectionMatrixId: null,
 //     aTextureCoordinateId: null,
-//     uTextureId: null,
+//     uDayTextureId: null,
 //     uEnableShadingId: null,
 //     aVertexNormalId: null,
 //     uNormalMatrixId: null,
@@ -69,7 +69,7 @@
 //     ctx.uModelViewMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uModelViewMatrix");
 //     ctx.uProjectionMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uProjectionMatrix");
 //     ctx.aTextureCoordinateId = gl.getAttribLocation(ctx.shaderProgram, "aVertexTextureCoordinate");
-//     ctx.uTextureId = gl.getUniformLocation(ctx.shaderProgram, "uTexture");
+//     ctx.uDayTextureId = gl.getUniformLocation(ctx.shaderProgram, "uTexture");
 //     ctx.uEnableShadingId = gl.getUniformLocation(ctx.shaderProgram, "uEnableShading");
 //     ctx.aVertexNormalId = gl.getAttribLocation(ctx.shaderProgram, "aVertexNormal");
 //     ctx.uNormalMatrixId = gl.getUniformLocation(ctx.shaderProgram, "uNormalMatrix");

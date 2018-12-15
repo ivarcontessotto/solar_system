@@ -92,7 +92,7 @@ function TextureSphere(gl, sectorCount, stackCount) {
     this.numberOfTriangles = (stackCount - 1) * sectorCount * 2;
 }
 
-TextureSphere.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, textureId, enableShading) {
+TextureSphere.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, dayTextureId, nightTextureId, enableShading) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     gl.vertexAttribPointer(shaderCtx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(shaderCtx.aVertexPositionId);
@@ -104,7 +104,8 @@ TextureSphere.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, t
     gl.vertexAttribPointer(shaderCtx.aTextureCoordinateId, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(shaderCtx.aTextureCoordinateId);
 
-    gl.uniform1i(shaderCtx.uTextureId, textureId);
+    gl.uniform1i(shaderCtx.uDayTextureId, dayTextureId);
+    gl.uniform1i(shaderCtx.uNightTextureId, nightTextureId);
 
     if (enableShading) {
         gl.uniform1i(shaderCtx.uEnableShadingId, 1);

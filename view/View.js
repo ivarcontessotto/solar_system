@@ -10,7 +10,8 @@ function View(canvas, model, callback) {
         this.shaderCtx.uModelViewMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uModelViewMatrix");
         this.shaderCtx.uProjectionMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uProjectionMatrix");
         this.shaderCtx.aTextureCoordinateId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexTextureCoordinate");
-        this.shaderCtx.uTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uTexture");
+        this.shaderCtx.uDayTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uDayTexture");
+        this.shaderCtx.uNightTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uNightTexture");
         this.shaderCtx.uEnableShadingId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uEnableShading");
         this.shaderCtx.aVertexNormalId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexNormal");
         this.shaderCtx.uNormalMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uNormalMatrix");
@@ -51,6 +52,9 @@ function View(canvas, model, callback) {
 
         this.gl.activeTexture(this.gl.TEXTURE1);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureItems[1].texture);
+
+        this.gl.activeTexture(this.gl.TEXTURE2);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.textureItems[2].texture);
     };
 
     let imagesToLoad = 0;
@@ -74,6 +78,7 @@ function View(canvas, model, callback) {
         this.textureItems = [];
         this.textureItems.push({url: "images/2k_sun.jpg"});
         this.textureItems.push({url: "images/2k_earth_daymap.jpg"});
+        this.textureItems.push({url: "images/2k_earth_nightmap.jpg"});
         imagesToLoad = this.textureItems.length;
         this.textureItems.forEach(loadImage);
     };
@@ -92,6 +97,6 @@ function View(canvas, model, callback) {
 
 View.prototype.draw = function() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.viewMatrix, 0, false);
-    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.viewMatrix, 1, true);
+    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.viewMatrix, 0, 0, false);
+    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.viewMatrix, 1, 2, true);
 };
