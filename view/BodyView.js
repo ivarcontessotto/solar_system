@@ -86,6 +86,7 @@ function BodyView(gl, sectorCount, stackCount) {
 }
 
 BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, textures, enableShading) {
+    // todo omg cleanup this ugly function
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     gl.vertexAttribPointer(shaderCtx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(shaderCtx.aVertexPositionId);
