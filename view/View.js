@@ -50,18 +50,19 @@ function View(canvas, model, callback) {
         this.gl.generateMipmap(this.gl.TEXTURE_2D);
     };
 
-    const sunMapIndex = 0;
-    const earthDaymapIndex = 1;
-    const earthNightmapIndex = 2;
-    const earthCloudmapIndex = 3;
-    const earthSpecularmapIndex = 4;
+    const blackMapIndex = 0;
+    const sunMapIndex = 1;
+    const earthDaymapIndex = 2;
+    const earthNightmapIndex = 3;
+    const earthCloudmapIndex = 4;
+    const earthSpecularmapIndex = 5;
 
     const setBodyTextures = () => {
         this.sunTextures = new BodyTextures(
             this.textureItems[sunMapIndex].texture,
             this.textureItems[sunMapIndex].texture,
             this.textureItems[sunMapIndex].texture,
-            this.textureItems[sunMapIndex].texture);
+            this.textureItems[blackMapIndex].texture);
 
         this.earthTextures = new BodyTextures(
             this.textureItems[earthDaymapIndex].texture,
@@ -89,6 +90,7 @@ function View(canvas, model, callback) {
 
     const loadTextureImages = () => {
         this.textureItems = [];
+        this.textureItems[blackMapIndex] = {url: "images/2k_black.jpg"};
         this.textureItems[sunMapIndex] = {url: "images/2k_sun.jpg"};
         this.textureItems[earthDaymapIndex] = {url: "images/2k_earth_daymap.jpg"};
         this.textureItems[earthNightmapIndex] = {url: "images/2k_earth_nightmap.jpg"};
