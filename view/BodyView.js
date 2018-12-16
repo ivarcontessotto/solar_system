@@ -85,7 +85,7 @@ function BodyView(gl, sectorCount, stackCount) {
     this.numberOfTriangles = (stackCount - 1) * sectorCount * 2;
 }
 
-BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, textures, enableShading) {
+BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, surface, enableShading) {
     // todo omg cleanup this ugly function
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     gl.vertexAttribPointer(shaderCtx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
@@ -99,20 +99,23 @@ BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, textur
     gl.enableVertexAttribArray(shaderCtx.aTextureCoordinateId);
 
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, textures.day);
-    gl.uniform1i(shaderCtx.uDayTextureId, 0);
+    gl.bindTexture(gl.TEXTURE_2D, surface.diffuseMap);
+    gl.uniform1i(shaderCtx.uDiffuseMapId, 0);
 
     gl.activeTexture(gl.TEXTURE0 + 1);
-    gl.bindTexture(gl.TEXTURE_2D, textures.night);
-    gl.uniform1i(shaderCtx.uNightTextureId, 1);
+    gl.bindTexture(gl.TEXTURE_2D, surface.specularMap);
+    gl.uniform1i(shaderCtx.uSpecularMapId, 1);
 
     gl.activeTexture(gl.TEXTURE0 + 2);
-    gl.bindTexture(gl.TEXTURE_2D, textures.cloud);
-    gl.uniform1i(shaderCtx.uCloudTextureId, 2);
+    gl.bindTexture(gl.TEXTURE_2D, surface.ambientMap);
+    gl.uniform1i(shaderCtx.uAmbientMapId, 2);
 
     gl.activeTexture(gl.TEXTURE0 + 3);
-    gl.bindTexture(gl.TEXTURE_2D, textures.specular);
-    gl.uniform1i(shaderCtx.uSpecularTextureId, 3);
+    gl.bindTexture(gl.TEXTURE_2D, surface.cloudMap);
+    gl.uniform1i(shaderCtx.uCloudMapId, 3);
+
+    gl.uniform4f(shaderCtx.uPhongStrengthId, surface.phongStrength[0], surface.phongStrength[1], surface.phongStrength[2], surface.phongStrength[3]);
+    gl.uniform2f(shaderCtx.uCloudStrengthId, surface.cloudStrength[0], surface.cloudStrength[1]);
 
     if (enableShading) {
         gl.uniform1i(shaderCtx.uEnableShadingId, 1);

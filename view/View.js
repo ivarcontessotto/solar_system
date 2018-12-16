@@ -11,10 +11,13 @@ function View(canvas, model, callback) {
         this.shaderCtx.uProjectionMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uProjectionMatrix");
 
         this.shaderCtx.aTextureCoordinateId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexTextureCoordinate");
-        this.shaderCtx.uDayTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uDayTexture");
-        this.shaderCtx.uNightTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uNightTexture");
-        this.shaderCtx.uCloudTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uCloudTexture");
-        this.shaderCtx.uSpecularTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uSpecularTexture");
+        this.shaderCtx.uDiffuseMapId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uDiffuseMap");
+        this.shaderCtx.uSpecularMapId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uSpecularMap");
+        this.shaderCtx.uAmbientMapId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uAmbientMap");
+        this.shaderCtx.uCloudMapId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uCloudMap");
+
+        this.shaderCtx.uPhongStrengthId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uPhongStrength");
+        this.shaderCtx.uCloudStrengthId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uCloudStrength");
 
         this.shaderCtx.uEnableShadingId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uEnableShading");
         this.shaderCtx.aVertexNormalId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexNormal");
@@ -52,23 +55,34 @@ function View(canvas, model, callback) {
 
     const blackMapIndex = 0;
     const sunMapIndex = 1;
-    const earthDaymapIndex = 2;
-    const earthNightmapIndex = 3;
-    const earthCloudmapIndex = 4;
-    const earthSpecularmapIndex = 5;
+    const earthDayMapIndex = 2;
+    const earthSpecularMapIndex = 3;
+    const earthNightMapIndex = 4;
+    const earthCloudMapIndex = 5;
 
-    const setBodyTextures = () => {
-        this.sunTextures = new BodyTextures(
-            this.textureItems[sunMapIndex].texture,
-            this.textureItems[sunMapIndex].texture,
-            this.textureItems[sunMapIndex].texture,
-            this.textureItems[blackMapIndex].texture);
+    const earthDiffuseStrength = 1;
+    const earthSpecularStrength = 0.5;
+    const earthShininess = 10;
+    const earthAmbientStrength = 0.5;
+    const earthCloudDiffuseStrength = 1;
+    const earthCloudAmbientStrength = 0.1;
 
-        this.earthTextures = new BodyTextures(
-            this.textureItems[earthDaymapIndex].texture,
-            this.textureItems[earthNightmapIndex].texture,
-            this.textureItems[earthCloudmapIndex].texture,
-            this.textureItems[earthSpecularmapIndex].texture);
+    const initBodySurfaceAttributes = () => {
+        this.sunSurface = new BodySurfaceAttribute(
+            this.textureItems[sunMapIndex].texture,
+            this.textureItems[blackMapIndex].texture,
+            this.textureItems[blackMapIndex].texture,
+            [0, 0, 0, 0],
+            this.textureItems[blackMapIndex].texture,
+            [0, 0]);
+
+        this.earthSurface = new BodySurfaceAttribute(
+            this.textureItems[earthDayMapIndex].texture,
+            this.textureItems[earthSpecularMapIndex].texture,
+            this.textureItems[earthNightMapIndex].texture,
+            [earthDiffuseStrength, earthSpecularStrength, earthShininess, earthAmbientStrength],
+            this.textureItems[earthCloudMapIndex].texture,
+            [earthCloudDiffuseStrength, earthCloudAmbientStrength]);
     };
 
     let imagesToLoad = 0;
@@ -77,7 +91,7 @@ function View(canvas, model, callback) {
         imagesToLoad--;
         if (imagesToLoad === 0) {
             this.textureItems.forEach(createTexture);
-            setBodyTextures();
+            initBodySurfaceAttributes();
             callback();
         }
     };
@@ -92,10 +106,10 @@ function View(canvas, model, callback) {
         this.textureItems = [];
         this.textureItems[blackMapIndex] = {url: "images/2k_black.jpg"};
         this.textureItems[sunMapIndex] = {url: "images/2k_sun.jpg"};
-        this.textureItems[earthDaymapIndex] = {url: "images/2k_earth_daymap.jpg"};
-        this.textureItems[earthNightmapIndex] = {url: "images/2k_earth_nightmap.jpg"};
-        this.textureItems[earthCloudmapIndex] = {url: "images/2k_earth_clouds.jpg"};
-        this.textureItems[earthSpecularmapIndex] = {url: "images/2k_earth_specular_map.jpg"};
+        this.textureItems[earthDayMapIndex] = {url: "images/2k_earth_daymap.jpg"};
+        this.textureItems[earthSpecularMapIndex] = {url: "images/2k_earth_specular_map.jpg"};
+        this.textureItems[earthNightMapIndex] = {url: "images/2k_earth_nightmap.jpg"};
+        this.textureItems[earthCloudMapIndex] = {url: "images/2k_earth_clouds.jpg"};
         imagesToLoad = this.textureItems.length;
         this.textureItems.forEach(loadImage);
     };
@@ -115,6 +129,6 @@ function View(canvas, model, callback) {
 
 View.prototype.draw = function() {
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.viewMatrix, this.sunTextures, false);
-    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.viewMatrix, this.earthTextures, true);
+    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.viewMatrix, this.sunSurface, false);
+    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.viewMatrix, this.earthSurface, true);
 };

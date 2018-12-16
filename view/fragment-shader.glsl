@@ -1,21 +1,22 @@
 precision mediump float;
 
-// todo pass strength factors for different textures with uniforms
-
 varying vec2 vFragmentTextureCoordinate;
+uniform sampler2D uDiffuseMap;
+uniform sampler2D uSpecularMap;
+uniform sampler2D uAmbientMap;
+uniform sampler2D uCloudMap;
 
-uniform sampler2D uDayTexture;
-uniform sampler2D uNightTexture;
+//uniform float uDiffuseStrength;
+//const float specularStrength = 0.5;
+//const float shininess = 10.0;
+//const float ambientStrength = 0.75;
+// [diffuseStr, specularStr, shininess, ambientStr]
+uniform vec4 uPhongStrength;
 
-uniform sampler2D uCloudTexture;
-const float cloudSrengthDay = 1.0;
-const float cloudStrengthNight = 0.1;
-
-uniform sampler2D uSpecularTexture;
-const float shininess = 10.0;
-const float specularStrength = 0.5;
-
-const float ambientStrength = 0.75;
+//const float cloudStrengthDay = 1.0;
+//const float cloudStrengthNight = 0.1;
+// [diffuseStr, ambientStr]
+uniform vec2 uCloudStrength;
 
 uniform bool uEnableShading;
 uniform vec3 uSunlightColor;
@@ -24,8 +25,8 @@ varying vec3 vFragmentPositionEye;
 varying vec3 vFragmentNormalEye;
 
 void main() {
-    vec3 baseColorCloud = texture2D(uCloudTexture, vFragmentTextureCoordinate).rgb;
-    vec3 baseColorDay = texture2D(uDayTexture, vFragmentTextureCoordinate).rgb + cloudSrengthDay * baseColorCloud;
+    vec3 baseCloudColor = texture2D(uCloudMap, vFragmentTextureCoordinate).rgb;
+    vec3 baseDiffuseColor = texture2D(uDiffuseMap, vFragmentTextureCoordinate).rgb + uCloudStrength[0] * baseCloudColor;
 
     if (uEnableShading) {
         vec3 fragmentLightDirection = normalize(uSunPositionEye - vFragmentPositionEye);
@@ -37,21 +38,21 @@ void main() {
         float diffuseFactor = max(dot(fragmentNormal, fragmentLightDirection), 0.0);
 
         if (diffuseFactor > 0.0) {
-            diffuseColor = diffuseFactor * uSunlightColor * baseColorDay;
+            diffuseColor = diffuseFactor * uPhongStrength[0] * uSunlightColor * baseDiffuseColor;
 
             vec3  fragmentEyeDirection = normalize(-vFragmentPositionEye);
             vec3 fragmentReflectionDirection = reflect(-fragmentLightDirection, fragmentNormal);
-            float specularFactor = pow(max(dot(fragmentReflectionDirection, fragmentEyeDirection), 0.0), shininess);
-            specularColor = specularFactor * specularStrength * uSunlightColor * texture2D(uSpecularTexture, vFragmentTextureCoordinate).rgb;
+            float specularFactor = pow(max(dot(fragmentReflectionDirection, fragmentEyeDirection), 0.0), uPhongStrength[2]);
+            specularColor = specularFactor * uPhongStrength[1] * uSunlightColor * texture2D(uSpecularMap, vFragmentTextureCoordinate).rgb;
         }
 
         // Ambient lighting
-        vec3 baseColorNight = texture2D(uNightTexture, vFragmentTextureCoordinate).rgb +  cloudStrengthNight * baseColorCloud;
-        vec3 ambientColor = (ambientStrength - min(2.0 * diffuseFactor, ambientStrength)) * baseColorNight;
+        vec3 baseAmbientColor = texture2D(uAmbientMap, vFragmentTextureCoordinate).rgb +  uCloudStrength[1] * baseCloudColor;
+        vec3 ambientColor = (uPhongStrength[3] - min(diffuseFactor, uPhongStrength[3])) * baseAmbientColor;
 
         gl_FragColor = vec4(diffuseColor + specularColor + ambientColor, 1);
     }
     else {
-        gl_FragColor = vec4(baseColorDay, 1);
+        gl_FragColor = vec4(baseDiffuseColor, 1);
     }
 }
