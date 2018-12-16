@@ -28,15 +28,15 @@ const earthOrbitalAxis = [0, 1, 0];
 
 function Model(canvas) {
 
-    const createLightPositionEye = () => {
+    const createSunPositionEye = () => {
         const vec = vec4MultiplyMat4(vec4.fromValues(this.sun.position[0], this.sun.position[1], this.sun.position[2], 1), this.viewMatrix);
         return vec3CartesianFromHomogeneous(vec);
     };
 
-    this.sun = new SolarSystemBody(sunRadius,sunRotationSpeed, sunRotationAxis, null, sunPositionFromOrigin, sunOrbitalSpeed, sunOrbitalAxis);
-    this.earth = new SolarSystemBody(earthRadius, earthRotationSpeed, earthRotationAxis, this.sun, earthRelPositionFromParent, earthOrbitalSpeed, earthOrbitalAxis);
+    this.sun = new BodyModel(sunRadius,sunRotationSpeed, sunRotationAxis, null, sunPositionFromOrigin, sunOrbitalSpeed, sunOrbitalAxis);
+    this.earth = new BodyModel(earthRadius, earthRotationSpeed, earthRotationAxis, this.sun, earthRelPositionFromParent, earthOrbitalSpeed, earthOrbitalAxis);
 
     this.projectionMatrix = mat4CreateProjection(verticalFieldOfView, canvas.width / canvas.height, zNear, zFar);
     this.viewMatrix = mat4CreateLookAt(eye, at, up);
-    this.lightPositionEye = createLightPositionEye();
+    this.sunPositionEye = createSunPositionEye(); // Todo If the sun would move, then this needs to be updated for every frame as well.
 }

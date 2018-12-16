@@ -1,6 +1,6 @@
 "use strict";
 
-function SolarSystemBody(radius, rotationSpeed, rotationAxis, parentBody, relPositionFromParent, orbitalSpeed, orbitalAxis) {
+function BodyModel(radius, rotationSpeed, rotationAxis, parentBody, relPositionFromParent, orbitalSpeed, orbitalAxis) {
 
     const calculatePosition = () => {
         if (this.parentBody != null) {
@@ -27,7 +27,7 @@ function SolarSystemBody(radius, rotationSpeed, rotationAxis, parentBody, relPos
     this.modelMatrix = createModelMatrix();
 }
 
-SolarSystemBody.prototype.rotateAroundOwnAxis = function(seconds) {
+BodyModel.prototype.rotateAroundOwnAxis = function(seconds) {
     const angle = this.roationSpeed * seconds;
     if (angle <= 0) {
         return;
@@ -45,7 +45,7 @@ SolarSystemBody.prototype.rotateAroundOwnAxis = function(seconds) {
     this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, translationFromOrigin3);
 };
 
-SolarSystemBody.prototype.orbit = function (seconds) {
+BodyModel.prototype.orbit = function (seconds) {
     // todo orbital axis needs to be updated to be updated according to parent position as soon as we have moons
     const angle = this.orbitalSpeed * seconds;
     if (angle <= 0) {

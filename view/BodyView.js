@@ -1,13 +1,6 @@
 "use strict";
 
-/**
- * Creates a solid sphere object.
- *
- * @param gl The webgl context
- * @param sectorCount The number of bands along the longitude direction
- * @param stackCount The number of bands along the latitude direction
- */
-function TextureSphere(gl, sectorCount, stackCount) {
+function BodyView(gl, sectorCount, stackCount) {
 
     const initArrayBuffers = () => {
         const vertexPositions = [];
@@ -92,7 +85,7 @@ function TextureSphere(gl, sectorCount, stackCount) {
     this.numberOfTriangles = (stackCount - 1) * sectorCount * 2;
 }
 
-TextureSphere.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, dayTextureId, nightTextureId, enableShading) {
+BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, textures, enableShading) {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     gl.vertexAttribPointer(shaderCtx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(shaderCtx.aVertexPositionId);
@@ -104,8 +97,13 @@ TextureSphere.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, d
     gl.vertexAttribPointer(shaderCtx.aTextureCoordinateId, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(shaderCtx.aTextureCoordinateId);
 
-    gl.uniform1i(shaderCtx.uDayTextureId, dayTextureId);
-    gl.uniform1i(shaderCtx.uNightTextureId, nightTextureId);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, textures.day);
+    gl.uniform1i(shaderCtx.uDayTextureId, 0);
+
+    gl.activeTexture(gl.TEXTURE1);
+    gl.bindTexture(gl.TEXTURE_2D, textures.night);
+    gl.uniform1i(shaderCtx.uNightTextureId, 1);
 
     if (enableShading) {
         gl.uniform1i(shaderCtx.uEnableShadingId, 1);
