@@ -130,7 +130,7 @@ function View(canvas, model, callback) {
     this.gl = createGLContext(canvas);
     console.log(this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
     this.model = model;
-    this.bodyView = new BodyView(this.gl, 20, 20); // todo if camera can move close this needs to be more detailed
+    this.bodyView = new BodyView(this.gl, 50, 50);
     setUpShaderProgram();
     setUpHiddenSurfaceRemoval();
     setUpProjectionMatrix();
