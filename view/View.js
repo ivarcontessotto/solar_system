@@ -9,9 +9,12 @@ function View(canvas, model, callback) {
         this.shaderCtx.aVertexPositionId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexPosition");
         this.shaderCtx.uModelViewMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uModelViewMatrix");
         this.shaderCtx.uProjectionMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uProjectionMatrix");
+
         this.shaderCtx.aTextureCoordinateId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexTextureCoordinate");
         this.shaderCtx.uDayTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uDayTexture");
         this.shaderCtx.uNightTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uNightTexture");
+        this.shaderCtx.uCloudTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uCloudTexture");
+
         this.shaderCtx.uEnableShadingId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uEnableShading");
         this.shaderCtx.aVertexNormalId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexNormal");
         this.shaderCtx.uNormalMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uNormalMatrix");
@@ -49,6 +52,7 @@ function View(canvas, model, callback) {
     const sunMapIndex = 0;
     const earthDaymapIndex = 1;
     const earthNightmapIndex = 2;
+    const earthCloudmapIndex = 3;
 
     const setBodyTextures = () => {
         this.sunTextures = new BodyTextures(
@@ -60,7 +64,7 @@ function View(canvas, model, callback) {
         this.earthTextures = new BodyTextures(
             this.textureItems[earthDaymapIndex].texture,
             this.textureItems[earthNightmapIndex].texture,
-            this.textureItems[earthDaymapIndex].texture,
+            this.textureItems[earthCloudmapIndex].texture,
             this.textureItems[earthDaymapIndex].texture);
     };
 
@@ -86,6 +90,7 @@ function View(canvas, model, callback) {
         this.textureItems[sunMapIndex] = {url: "images/2k_sun.jpg"};
         this.textureItems[earthDaymapIndex] = {url: "images/2k_earth_daymap.jpg"};
         this.textureItems[earthNightmapIndex] = {url: "images/2k_earth_nightmap.jpg"};
+        this.textureItems[earthCloudmapIndex] = {url: "images/2k_earth_clouds.jpg"};
         imagesToLoad = this.textureItems.length;
         this.textureItems.forEach(loadImage);
     };

@@ -101,9 +101,13 @@ BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, textur
     gl.bindTexture(gl.TEXTURE_2D, textures.day);
     gl.uniform1i(shaderCtx.uDayTextureId, 0);
 
-    gl.activeTexture(gl.TEXTURE1);
+    gl.activeTexture(gl.TEXTURE0 + 1);
     gl.bindTexture(gl.TEXTURE_2D, textures.night);
     gl.uniform1i(shaderCtx.uNightTextureId, 1);
+
+    gl.activeTexture(gl.TEXTURE0 + 2);
+    gl.bindTexture(gl.TEXTURE_2D, textures.cloud);
+    gl.uniform1i(shaderCtx.uCloudTextureId, 2);
 
     if (enableShading) {
         gl.uniform1i(shaderCtx.uEnableShadingId, 1);

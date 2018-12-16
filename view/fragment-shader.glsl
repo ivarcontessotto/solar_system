@@ -3,6 +3,7 @@ precision mediump float;
 varying vec2 vFragmentTextureCoordinate;
 uniform sampler2D uDayTexture;
 uniform sampler2D uNightTexture;
+uniform sampler2D uCloudTexture;
 
 uniform bool uEnableShading;
 uniform vec3 uSunPositionEye;
@@ -15,7 +16,7 @@ const float shininess = 10.0;
 const vec3 specularMaterialColor = vec3(0.6, 0.6, 0.6);
 
 void main() {
-    vec3 baseColorDay = texture2D(uDayTexture, vFragmentTextureCoordinate).rgb;
+    vec3 baseColorDay = texture2D(uDayTexture, vFragmentTextureCoordinate).rgb + texture2D(uCloudTexture, vFragmentTextureCoordinate).rgb;
 
     if (uEnableShading) {
         vec3 lightDirection = normalize(uSunPositionEye - vFragmentPositionEye);
@@ -35,7 +36,8 @@ void main() {
         }
 
         // Ambient lighting
-        vec3 ambientColor = (0.75 - max(min(2.0*diffuseFactor, 1.0), 0.0)) * texture2D(uNightTexture, vFragmentTextureCoordinate).rgb;
+        vec3 baseColorNight = texture2D(uNightTexture, vFragmentTextureCoordinate).rgb +  0.1 * texture2D(uCloudTexture, vFragmentTextureCoordinate).rgb;;
+        vec3 ambientColor = (0.75 - max(min(2.0 * diffuseFactor, 1.0), 0.0)) * baseColorNight;
 
         gl_FragColor = vec4(ambientColor + diffuseColor + specularColor, 1);
     }
