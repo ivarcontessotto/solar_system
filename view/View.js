@@ -14,6 +14,7 @@ function View(canvas, model, callback) {
         this.shaderCtx.uDayTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uDayTexture");
         this.shaderCtx.uNightTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uNightTexture");
         this.shaderCtx.uCloudTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uCloudTexture");
+        this.shaderCtx.uSpecularTextureId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uSpecularTexture");
 
         this.shaderCtx.uEnableShadingId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uEnableShading");
         this.shaderCtx.aVertexNormalId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexNormal");
@@ -53,6 +54,7 @@ function View(canvas, model, callback) {
     const earthDaymapIndex = 1;
     const earthNightmapIndex = 2;
     const earthCloudmapIndex = 3;
+    const earthSpecularmapIndex = 4;
 
     const setBodyTextures = () => {
         this.sunTextures = new BodyTextures(
@@ -65,7 +67,7 @@ function View(canvas, model, callback) {
             this.textureItems[earthDaymapIndex].texture,
             this.textureItems[earthNightmapIndex].texture,
             this.textureItems[earthCloudmapIndex].texture,
-            this.textureItems[earthDaymapIndex].texture);
+            this.textureItems[earthSpecularmapIndex].texture);
     };
 
     let imagesToLoad = 0;
@@ -91,6 +93,7 @@ function View(canvas, model, callback) {
         this.textureItems[earthDaymapIndex] = {url: "images/2k_earth_daymap.jpg"};
         this.textureItems[earthNightmapIndex] = {url: "images/2k_earth_nightmap.jpg"};
         this.textureItems[earthCloudmapIndex] = {url: "images/2k_earth_clouds.jpg"};
+        this.textureItems[earthSpecularmapIndex] = {url: "images/2k_earth_specular_map.jpg"};
         imagesToLoad = this.textureItems.length;
         this.textureItems.forEach(loadImage);
     };

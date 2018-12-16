@@ -109,6 +109,10 @@ BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, textur
     gl.bindTexture(gl.TEXTURE_2D, textures.cloud);
     gl.uniform1i(shaderCtx.uCloudTextureId, 2);
 
+    gl.activeTexture(gl.TEXTURE0 + 3);
+    gl.bindTexture(gl.TEXTURE_2D, textures.specular);
+    gl.uniform1i(shaderCtx.uSpecularTextureId, 3);
+
     if (enableShading) {
         gl.uniform1i(shaderCtx.uEnableShadingId, 1);
 
