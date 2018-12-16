@@ -40,15 +40,18 @@ function Model(canvas) {
 Model.prototype.update = function (runtime, cameraMovement) {
 
     const updateViewMatrix = () => {
-        const translationVector = [
-            runtime * this.cameraTranslationSpeed * (cameraMovement[1] - cameraMovement[0]),
-            0,
-            runtime * this.cameraTranslationSpeed * (cameraMovement[2] - cameraMovement[3])];
+        // Boost forward / backward
+        const translationVector = [0, 0, runtime * this.cameraTranslationSpeed * (cameraMovement[0] - cameraMovement[1])];
         this.viewMatrix = mat4TranslatePreMul(this.viewMatrix, translationVector);
-        let rotationAngle = runtime * this.cameraRotationSpeed * (cameraMovement[4] - cameraMovement[5]);
-        this.viewMatrix = mat4RotatePreMul(this.viewMatrix, rotationAngle, [0, 1, 0]);
-        rotationAngle = runtime * this.cameraRotationSpeed * (cameraMovement[6] - cameraMovement[7]);
+        // Roll left / right
+        let rotationAngle = runtime * this.cameraRotationSpeed * (cameraMovement[3] - cameraMovement[2]);
+        this.viewMatrix = mat4RotatePreMul(this.viewMatrix, rotationAngle, [0, 0, 1]);
+        // Rotate up / down
+        rotationAngle = runtime * this.cameraRotationSpeed * (cameraMovement[5] - cameraMovement[4]);
         this.viewMatrix = mat4RotatePreMul(this.viewMatrix, rotationAngle, [1, 0, 0]);
+        // Rotate left / right
+        rotationAngle = runtime * this.cameraRotationSpeed * (cameraMovement[7] - cameraMovement[6]);
+        this.viewMatrix = mat4RotatePreMul(this.viewMatrix, rotationAngle, [0, 1, 0]);
     };
 
     const createSunPositionEye = () => {
