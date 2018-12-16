@@ -2,19 +2,28 @@
 
 function View(canvas, model, callback) {
 
+    // Map indexes
     const blackMapIndex = 0;
     const sunMapIndex = 1;
     const earthDayMapIndex = 2;
     const earthSpecularMapIndex = 3;
     const earthNightMapIndex = 4;
     const earthCloudMapIndex = 5;
+    const earthMoonMapIndex = 6;
 
+    // Earth surface constants
     const earthDiffuseStrength = 1;
     const earthSpecularStrength = 0.5;
     const earthShininess = 10;
     const earthAmbientStrength = 0.5;
     const earthCloudDiffuseStrength = 1;
     const earthCloudAmbientStrength = 0.1;
+
+    // Earth Moon surface constants
+    const earthMoonDiffuseStrength = 1;
+    const earthMoonSpecularStrength = 0.75;
+    const earthMoonShininess = 1;
+    const earthMoonAmbientStrength = 0.05;
 
     const setUpShaderProgram = () => {
         this.shaderCtx = {};
@@ -78,6 +87,14 @@ function View(canvas, model, callback) {
             [earthDiffuseStrength, earthSpecularStrength, earthShininess, earthAmbientStrength],
             this.textureItems[earthCloudMapIndex].texture,
             [earthCloudDiffuseStrength, earthCloudAmbientStrength]);
+
+        this.earthMoonSurface = new BodySurfaceAttribute(
+            this.textureItems[earthMoonMapIndex].texture,
+            this.textureItems[earthMoonMapIndex].texture,
+            this.textureItems[earthMoonMapIndex].texture,
+            [earthMoonDiffuseStrength, earthMoonSpecularStrength, earthMoonShininess, earthMoonAmbientStrength],
+            this.textureItems[blackMapIndex].texture,
+            [0, 0]);
     };
 
     let imagesToLoad = 0;
@@ -105,6 +122,7 @@ function View(canvas, model, callback) {
         this.textureItems[earthSpecularMapIndex] = {url: "images/2k_earth_specular_map.jpg"};
         this.textureItems[earthNightMapIndex] = {url: "images/2k_earth_nightmap.jpg"};
         this.textureItems[earthCloudMapIndex] = {url: "images/2k_earth_clouds.jpg"};
+        this.textureItems[earthMoonMapIndex] = {url: "images/2k_moon.jpg"};
         imagesToLoad = this.textureItems.length;
         this.textureItems.forEach(loadImage);
     };
@@ -112,7 +130,7 @@ function View(canvas, model, callback) {
     this.gl = createGLContext(canvas);
     console.log(this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
     this.model = model;
-    this.textureSphere = new BodyView(this.gl, 20, 20); // todo if camera can move close this needs to be more detailed
+    this.bodyView = new BodyView(this.gl, 20, 20); // todo if camera can move close this needs to be more detailed
     setUpShaderProgram();
     setUpHiddenSurfaceRemoval();
     setUpProjectionMatrix();
@@ -131,6 +149,7 @@ View.prototype.draw = function() {
     setUpSunlight();
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.viewMatrix, this.sunSurface, false);
-    this.textureSphere.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.viewMatrix, this.earthSurface, true);
+    this.bodyView.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.viewMatrix, this.sunSurface, false);
+    this.bodyView.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.viewMatrix, this.earthSurface, true);
+    this.bodyView.draw(this.gl, this.shaderCtx, this.model.earthMoon.modelMatrix, this.model.viewMatrix, this.earthMoonSurface, true);
 };

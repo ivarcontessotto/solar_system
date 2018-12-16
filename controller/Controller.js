@@ -5,6 +5,7 @@ function Controller(model, view) {
 
     this.key = {
         pressed: {},
+        // Defines key functions
         FORWARD_BOOST: 87,      // W
         BACKWARD_BOOST: 83,     // S
         ROLL_LEFT: 65,          // A
@@ -46,10 +47,11 @@ Controller.prototype.run = function() {
     };
 
     const animateFrame = (timeStamp) => {
-        // todo Check key pressed and do something with it.
+        // todo kind of ugly.
         this.model.update(
             seconds(timeStamp - this.startTime),
             [
+                // Order is critical
                 this.key.pressed[this.key.FORWARD_BOOST],
                 this.key.pressed[this.key.BACKWARD_BOOST],
                 this.key.pressed[this.key.ROLL_LEFT],
@@ -59,6 +61,7 @@ Controller.prototype.run = function() {
                 this.key.pressed[this.key.ROTATE_LEFT],
                 this.key.pressed[this.key.ROTATE_RIGHT]
             ]);
+
         this.view.draw();
 
         this.startTime = timeStamp;

@@ -19,8 +19,6 @@ function Model(canvas) {
     const sunRotationSpeed = Math.PI / 64;
     const sunRotationAxis = [0, 1, 0];
     const sunPositionFromOrigin = 0;
-    const sunOrbitalSpeed = 0;
-    const sunOrbitalAxis = null;
 
     // Earth
     const earthRadius = 80;
@@ -30,8 +28,43 @@ function Model(canvas) {
     const earthOrbitalSpeed = Math.PI / 16;
     const earthOrbitalAxis = [0, 1, 0];
 
-    this.sun = new BodyModel(sunRadius,sunRotationSpeed, sunRotationAxis, null, sunPositionFromOrigin, sunOrbitalSpeed, sunOrbitalAxis);
-    this.earth = new BodyModel(earthRadius, earthRotationSpeed, earthRotationAxis, this.sun, earthRelPositionFromParent, earthOrbitalSpeed, earthOrbitalAxis);
+    // Earth Moon
+    const earthMoonRadius = 30;
+    const earthMoonRotationSpeed = 0;
+    const earthMoonRotationAxis = [0, 1, 0];
+    const earthMoonRelPositionFromParent = [300, 0, 0];
+    const earthMoonOrbitalSpeed = Math.PI / 4;
+    const earthMoonOrbitalAxis = [0, 1, 0];
+
+    this.sun = new BodyModel(
+        sunRadius,
+        sunRotationSpeed,
+        sunRotationAxis,
+        null,
+        sunPositionFromOrigin,
+        0,
+        [0, 1, 0]
+    );
+
+    this.earth = new BodyModel(
+        earthRadius,
+        earthRotationSpeed,
+        earthRotationAxis,
+        this.sun,
+        earthRelPositionFromParent,
+        earthOrbitalSpeed,
+        earthOrbitalAxis
+    );
+
+    this.earthMoon = new BodyModel(
+        earthMoonRadius,
+        earthMoonRotationSpeed,
+        earthMoonRotationAxis,
+        this.earth,
+        earthMoonRelPositionFromParent,
+        earthMoonOrbitalSpeed,
+        earthMoonOrbitalAxis
+    );
 
     this.projectionMatrix = mat4CreateProjection(verticalFieldOfView, canvas.width / canvas.height, zNear, zFar);
     this.viewMatrix = mat4CreateLookAt(this.eye, this.at, this.up);
@@ -61,8 +94,8 @@ Model.prototype.update = function (runtime, cameraMovement) {
 
     updateViewMatrix();
     this.sunPositionEye = createSunPositionEye();
-    this.sun.orbit(runtime);
     this.sun.rotateAroundOwnAxis(runtime);
     this.earth.orbit(runtime);
     this.earth.rotateAroundOwnAxis(runtime);
+    this.earthMoon.orbit(runtime);
 };
