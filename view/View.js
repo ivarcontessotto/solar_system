@@ -2,6 +2,20 @@
 
 function View(canvas, model, callback) {
 
+    const blackMapIndex = 0;
+    const sunMapIndex = 1;
+    const earthDayMapIndex = 2;
+    const earthSpecularMapIndex = 3;
+    const earthNightMapIndex = 4;
+    const earthCloudMapIndex = 5;
+
+    const earthDiffuseStrength = 1;
+    const earthSpecularStrength = 0.5;
+    const earthShininess = 10;
+    const earthAmbientStrength = 0.5;
+    const earthCloudDiffuseStrength = 1;
+    const earthCloudAmbientStrength = 0.1;
+
     const setUpShaderProgram = () => {
         this.shaderCtx = {};
         this.shaderCtx.shaderProgram = setupProgram(this.gl, "view/vertex-shader.glsl", "view/fragment-shader.glsl");
@@ -39,11 +53,6 @@ function View(canvas, model, callback) {
         this.gl.uniformMatrix4fv(this.shaderCtx.uProjectionMatrixId, false, this.model.projectionMatrix);
     };
 
-    const setUpSunlight = () => {
-        this.gl.uniform3fv(this.shaderCtx.uSunPositionEyeId, this.model.sunPositionEye);
-        this.gl.uniform3fv(this.shaderCtx.uSunlightColorId,[1, 1, 1]);
-    };
-
     const createTexture = (item, index) => {
         item.texture = this.gl.createTexture();
         this.gl.bindTexture(this.gl.TEXTURE_2D, item.texture);
@@ -52,20 +61,6 @@ function View(canvas, model, callback) {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
         this.gl.generateMipmap(this.gl.TEXTURE_2D);
     };
-
-    const blackMapIndex = 0;
-    const sunMapIndex = 1;
-    const earthDayMapIndex = 2;
-    const earthSpecularMapIndex = 3;
-    const earthNightMapIndex = 4;
-    const earthCloudMapIndex = 5;
-
-    const earthDiffuseStrength = 1;
-    const earthSpecularStrength = 0.5;
-    const earthShininess = 10;
-    const earthAmbientStrength = 0.5;
-    const earthCloudDiffuseStrength = 1;
-    const earthCloudAmbientStrength = 0.1;
 
     const initBodySurfaceAttributes = () => {
         this.sunSurface = new BodySurfaceAttribute(
@@ -117,17 +112,24 @@ function View(canvas, model, callback) {
     this.gl = createGLContext(canvas);
     console.log(this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
     this.model = model;
-    this.textureSphere = new BodyView(this.gl, 20, 20);
+    this.textureSphere = new BodyView(this.gl, 20, 20); // todo if camera can move close this needs to be more detailed
     setUpShaderProgram();
     setUpHiddenSurfaceRemoval();
     setUpProjectionMatrix();
-    setUpSunlight();
     this.gl.clearColor(0, 0, 0, 1);
     // This needs to be done last because images are loaded asynchronously in browser!
     loadTextureImages();
 }
 
 View.prototype.draw = function() {
+
+    const setUpSunlight = () => {
+        this.gl.uniform3fv(this.shaderCtx.uSunPositionEyeId, this.model.sunPositionEye);
+        this.gl.uniform3fv(this.shaderCtx.uSunlightColorId,[1, 1, 1]);
+    };
+
+    setUpSunlight();
+
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.textureSphere.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.viewMatrix, this.sunSurface, false);
     this.textureSphere.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.viewMatrix, this.earthSurface, true);

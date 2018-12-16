@@ -46,6 +46,10 @@ function vec4MultiplyMat4(vector, matrix) {
 
 // Vec 3 --------------------------------------------------------------------------------------------------------------
 
+function vec3Add(first, second) {
+    return vec3.add(vec3.create(), first, second);
+}
+
 function vec3MultiplyScalar(vector, scalar) {
     return [
         vector[0] * scalar,
