@@ -6,16 +6,7 @@ uniform sampler2D uSpecularMap;
 uniform sampler2D uAmbientMap;
 uniform sampler2D uCloudMap;
 
-//uniform float uDiffuseStrength;
-//const float specularStrength = 0.5;
-//const float shininess = 10.0;
-//const float ambientStrength = 0.75;
-// [diffuseStr, specularStr, shininess, ambientStr]
 uniform vec4 uPhongStrength;
-
-//const float cloudStrengthDay = 1.0;
-//const float cloudStrengthNight = 0.1;
-// [diffuseStr, ambientStr]
 uniform vec2 uCloudStrength;
 
 uniform bool uEnableShading;
@@ -24,7 +15,14 @@ uniform vec3 uSunPositionEye;
 varying vec3 vFragmentPositionEye;
 varying vec3 vFragmentNormalEye;
 
+uniform bool uRenderShadowmap;
+
 void main() {
+
+    if(uRenderShadowmap) {
+        return;
+    }
+
     vec3 baseCloudColor = texture2D(uCloudMap, vFragmentTextureCoordinate).rgb;
     vec3 baseDiffuseColor = texture2D(uDiffuseMap, vFragmentTextureCoordinate).rgb + uCloudStrength[0] * baseCloudColor;
 

@@ -87,6 +87,9 @@ function BodyView(gl, sectorCount, stackCount) {
 
 BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, surface, enableShading) {
     // todo omg cleanup this ugly function
+
+    gl.uniform1i(shaderCtx.uRenderShadowMapId, 0);
+
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     gl.vertexAttribPointer(shaderCtx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(shaderCtx.aVertexPositionId);
@@ -136,4 +139,18 @@ BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, surfac
     gl.disableVertexAttribArray(shaderCtx.aVertexPositionId);
     gl.disableVertexAttribArray(shaderCtx.aTextureCoordinateId);
     gl.disableVertexAttribArray(shaderCtx.aVertexNormalId);
+};
+
+BodyView.prototype.drawShadowMap = function(gl, shaderCtx, modelMatrix, lightMatrix) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
+    gl.vertexAttribPointer(shaderCtx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(shaderCtx.aVertexPositionId);
+
+    const modelLightMatrix = mat4Multiply(lightMatrix, modelMatrix);
+    gl.uniformMatrix4fv(shaderCtx.uModelLightMatrixId, false, modelLightMatrix);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+    gl.drawElements(gl.TRIANGLES, this.numberOfTriangles * 3 ,gl.UNSIGNED_SHORT, 0);
+
+    gl.disableVertexAttribArray(shaderCtx.aVertexPositionId);
 };

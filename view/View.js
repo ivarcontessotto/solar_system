@@ -47,6 +47,9 @@ function View(canvas, model, callback) {
         this.shaderCtx.uNormalMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uNormalMatrix");
         this.shaderCtx.uSunPositionEyeId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uSunPositionEye");
         this.shaderCtx.uSunlightColorId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uSunlightColor");
+
+        this.shaderCtx.uRenderShadowMapId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uRenderShadowMap");
+        this.shaderCtx.uModelLightMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uModelLightMatrix");
     };
 
     const setUpHiddenSurfaceRemoval = () => {
