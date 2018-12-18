@@ -1,7 +1,6 @@
 "use strict";
 
 // Define camera control with keyboard.
-// Camera looks in direction negative z-axis with y-axis = up-axis.
 const MOVE_FORWARD = 87;    // W
 const MOVE_BACKWARD = 83;   // S
 const ROTATE_LEFT = 65;     // A
@@ -17,10 +16,10 @@ function Controller(model, view) {
     this.keysPressed[MOVE_BACKWARD] = 0;
     this.keysPressed[ROTATE_LEFT] = 0;
     this.keysPressed[ROTATE_RIGHT] = 0;
-    this.keysPressed[ROLL_RIGHT] = 0;
     this.keysPressed[ROLL_FORWARD] = 0;
     this.keysPressed[ROLL_BACKWARD] = 0;
     this.keysPressed[ROLL_LEFT] = 0;
+    this.keysPressed[ROLL_RIGHT] = 0;
 
     this.model = model;
     this.view = view;
@@ -41,14 +40,14 @@ Controller.prototype.run = function() {
 
     const startAnimation = (timeStamp) => {
         this.startTime = timeStamp;
-        window.requestAnimationFrame(animateFrame);
+        window.requestAnimationFrame(animate);
     };
 
-    const animateFrame = (timeStamp) => {
+    const animate = (timeStamp) => {
         this.model.update(seconds(timeStamp - this.startTime), this.keysPressed);
         this.view.draw();
         this.startTime = timeStamp;
-        window.requestAnimationFrame(animateFrame);
+        window.requestAnimationFrame(animate);
     };
 
     window.addEventListener('keyup', onKeyUp, false);

@@ -1,5 +1,29 @@
 "use strict";
 
+// Sun
+const SUN_RADIUS = 500;
+const SUN_ROTATION_SPEED = Math.PI / 64;
+const SUN_ROTATION_AXIS = [0, 1, 0];
+const SUN_POSITION_FROM_ORIGIN = [0, 0, 0];
+const SUN_ORBITAL_SPEED = 0;
+const SUN_ORBITAL_AXIS = [0, 1, 0];
+
+// Earth
+const EARTH_RADIUS = 80;
+const EARTH_ROTATION_SPEED = Math.PI / 8;
+const EARTH_ROTATION_AXIS = [0, 1, 0];
+const EARTH_POSITION_FROM_SUN = [1500, 0, 0];
+const EARTH_ORBITAL_SPEED = Math.PI / 32;
+const EARTH_ORBITAL_AXIS = [0, 1, 0];
+
+// Earth Moon
+const EARTHMOON_RADIUS = 30;
+const EARTHMOON_ROTATION_SPEED = 0;
+const EARTHMOON_ROTATION_AXIS = [0, 1, 0];
+const EARTHMOON_POSITION_FROM_EARTH = [300, 0, 0];
+const EARTHMOON_ORBITAL_SPEED = Math.PI / 8;
+const EARTHMOON_ORBITAL_AXIS = [0, 1, 0];
+
 function Model(canvas) {
 
     // Projection // todo put this into camera model object
@@ -14,56 +38,34 @@ function Model(canvas) {
     this.cameraTranslationSpeed = 1000;
     this.cameraRotationSpeed = Math.PI / 2;
 
-    // Sun
-    const sunRadius = 500;
-    const sunRotationSpeed = Math.PI / 64;
-    const sunRotationAxis = [0, 1, 0];
-    const sunPositionFromOrigin = 0;
-
-    // Earth
-    const earthRadius = 80;
-    const earthRotationSpeed = Math.PI / 8;
-    const earthRotationAxis = [0, 1, 0];
-    const earthRelPositionFromParent = [1500, 0, 0];
-    const earthOrbitalSpeed = Math.PI / 16;
-    const earthOrbitalAxis = [0, 1, 0];
-
-    // Earth Moon
-    const earthMoonRadius = 30;
-    const earthMoonRotationSpeed = 0;
-    const earthMoonRotationAxis = [0, 1, 0];
-    const earthMoonRelPositionFromParent = [300, 0, 0];
-    const earthMoonOrbitalSpeed = Math.PI / 4;
-    const earthMoonOrbitalAxis = [0, 1, 0];
-
     this.sun = new BodyModel(
-        sunRadius,
-        sunRotationSpeed,
-        sunRotationAxis,
+        SUN_RADIUS,
+        SUN_ROTATION_SPEED,
+        SUN_ROTATION_AXIS,
         null,
-        sunPositionFromOrigin,
-        0,
-        [0, 1, 0]
+        SUN_POSITION_FROM_ORIGIN,
+        SUN_ORBITAL_SPEED,
+        SUN_ORBITAL_AXIS
     );
 
     this.earth = new BodyModel(
-        earthRadius,
-        earthRotationSpeed,
-        earthRotationAxis,
+        EARTH_RADIUS,
+        EARTH_ROTATION_SPEED,
+        EARTH_ROTATION_AXIS,
         this.sun,
-        earthRelPositionFromParent,
-        earthOrbitalSpeed,
-        earthOrbitalAxis
+        EARTH_POSITION_FROM_SUN,
+        EARTH_ORBITAL_SPEED,
+        EARTH_ORBITAL_AXIS
     );
 
     this.earthMoon = new BodyModel(
-        earthMoonRadius,
-        earthMoonRotationSpeed,
-        earthMoonRotationAxis,
+        EARTHMOON_RADIUS,
+        EARTHMOON_ROTATION_SPEED,
+        EARTHMOON_ROTATION_AXIS,
         this.earth,
-        earthMoonRelPositionFromParent,
-        earthMoonOrbitalSpeed,
-        earthMoonOrbitalAxis
+        EARTHMOON_POSITION_FROM_EARTH,
+        EARTHMOON_ORBITAL_SPEED,
+        EARTHMOON_ORBITAL_AXIS
     );
 
     const createSunPositionEye = () => {
@@ -103,10 +105,10 @@ Model.prototype.update = function (runtime, keysPressed) {
                 vec4CartessianToHomogeneous(this.sun.position), this.viewMatrix));
     };
 
-    updateViewMatrix();
-    updateSunPositionEye();
     this.sun.rotateAroundOwnAxis(runtime);
     this.earth.orbit(runtime);
     this.earth.rotateAroundOwnAxis(runtime);
     this.earthMoon.orbit(runtime);
+    updateViewMatrix();
+    updateSunPositionEye();
 };
