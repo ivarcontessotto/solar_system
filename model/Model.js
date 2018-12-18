@@ -66,34 +66,45 @@ function Model(canvas) {
         earthMoonOrbitalAxis
     );
 
-    this.projectionMatrix = mat4CreateProjection(verticalFieldOfView, canvas.width / canvas.height, zNear, zFar);
-    this.viewMatrix = mat4CreateLookAt(this.eye, this.at, this.up);
-}
-
-Model.prototype.update = function (runtime, cameraMovement) {
-
-    const updateViewMatrix = () => {
-        // Boost forward / backward
-        const translationVector = [0, 0, runtime * this.cameraTranslationSpeed * (cameraMovement[0] - cameraMovement[1])];
-        this.viewMatrix = mat4TranslatePreMul(this.viewMatrix, translationVector);
-        // Roll left / right
-        let rotationAngle = runtime * this.cameraRotationSpeed * (cameraMovement[3] - cameraMovement[2]);
-        this.viewMatrix = mat4RotatePreMul(this.viewMatrix, rotationAngle, [0, 0, 1]);
-        // Rotate up / down
-        rotationAngle = runtime * this.cameraRotationSpeed * (cameraMovement[5] - cameraMovement[4]);
-        this.viewMatrix = mat4RotatePreMul(this.viewMatrix, rotationAngle, [1, 0, 0]);
-        // Rotate left / right
-        rotationAngle = runtime * this.cameraRotationSpeed * (cameraMovement[7] - cameraMovement[6]);
-        this.viewMatrix = mat4RotatePreMul(this.viewMatrix, rotationAngle, [0, 1, 0]);
+    const createSunPositionEye = () => {
+        this.sunPositionEye = vec3HomogeneousToCartesian(
+            vec4MultiplyMat4(
+                vec4CartessianToHomogeneous(this.sun.position), this.viewMatrix));
     };
 
-    const createSunPositionEye = () => {
-        const sunPositionEye = vec4MultiplyMat4(vec4.fromValues(this.sun.position[0], this.sun.position[1], this.sun.position[2], 1), this.viewMatrix);
-        return vec3CartesianFromHomogeneous(sunPositionEye);
+    this.projectionMatrix = mat4CreateProjection(verticalFieldOfView, canvas.width / canvas.height, zNear, zFar);
+    this.viewMatrix = mat4CreateLookAt(this.eye, this.at, this.up);
+    createSunPositionEye();
+}
+
+Model.prototype.update = function (runtime, keysPressed) {
+
+    const updateViewMatrix = () => {
+        // Move camera forward backward
+        const translationFactor = this.cameraTranslationSpeed * runtime;
+        const translationVector = [0, 0, translationFactor * (keysPressed[MOVE_FORWARD] - keysPressed[MOVE_BACKWARD])];
+        this.viewMatrix = mat4TranslatePreMul(this.viewMatrix, translationVector);
+
+        const rotationFactor = this.cameraRotationSpeed * runtime;
+        // Rotate camera left right
+        let rotationAngle = rotationFactor * (keysPressed[ROTATE_LEFT] - keysPressed[ROTATE_RIGHT]);
+        this.viewMatrix = mat4RotatePreMul(this.viewMatrix, -rotationAngle, [0, 1, 0]);
+        // Roll camera forward backward
+        rotationAngle = rotationFactor * (keysPressed[ROLL_FORWARD] - keysPressed[ROLL_BACKWARD]);
+        this.viewMatrix = mat4RotatePreMul(this.viewMatrix, rotationAngle, [1, 0, 0]);
+        // Roll camera left right
+        rotationAngle = rotationFactor * (keysPressed[ROLL_LEFT] - keysPressed[ROLL_RIGHT]);
+        this.viewMatrix = mat4RotatePreMul(this.viewMatrix, -rotationAngle, [0, 0, 1]);
+    };
+
+    const updateSunPositionEye = () => {
+        this.sunPositionEye = vec3HomogeneousToCartesian(
+            vec4MultiplyMat4(
+                vec4CartessianToHomogeneous(this.sun.position), this.viewMatrix));
     };
 
     updateViewMatrix();
-    this.sunPositionEye = createSunPositionEye();
+    updateSunPositionEye();
     this.sun.rotateAroundOwnAxis(runtime);
     this.earth.orbit(runtime);
     this.earth.rotateAroundOwnAxis(runtime);

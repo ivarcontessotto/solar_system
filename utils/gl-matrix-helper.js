@@ -44,6 +44,10 @@ function vec4MultiplyMat4(vector, matrix) {
     return vec4.transformMat4(vec4.create(), vector, matrix);
 }
 
+function vec4CartessianToHomogeneous(cartesian) {
+    return vec4.fromValues(cartesian[0], cartesian[1], cartesian[2], 1);
+}
+
 // Vec 3 --------------------------------------------------------------------------------------------------------------
 
 function vec3Add(first, second) {
@@ -57,8 +61,7 @@ function vec3MultiplyScalar(vector, scalar) {
         vector[2] * scalar
     ];
 }
-
-function vec3CartesianFromHomogeneous(homogeneous) {
+function vec3HomogeneousToCartesian(homogeneous) {
     return vec3.fromValues(
         homogeneous[0] / homogeneous[3],
         homogeneous[1] / homogeneous[3],

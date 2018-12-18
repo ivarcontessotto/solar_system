@@ -1,28 +1,26 @@
 "use strict";
 
+// Define camera control with keyboard.
+// Camera looks in direction negative z-axis with y-axis = up-axis.
+const MOVE_FORWARD = 87;    // W
+const MOVE_BACKWARD = 83;   // S
+const ROTATE_LEFT = 65;     // A
+const ROTATE_RIGHT = 68;    // S
+const ROLL_FORWARD = 38;    // forward arrow
+const ROLL_BACKWARD = 40;   // backward arrow
+const ROLL_LEFT = 37;       // left arrow
+const ROLL_RIGHT = 39;      // right arrow
 
 function Controller(model, view) {
-
-    this.key = {
-        pressed: {},
-        // Defines key functions
-        FORWARD_BOOST: 87,      // W
-        BACKWARD_BOOST: 83,     // S
-        ROLL_LEFT: 65,          // A
-        ROLL_RIGHT: 68,         // F
-        ROTATE_UP: 38,          // backward arrow
-        ROTATE_DOWN: 40,        // forward arrow
-        ROTATE_LEFT: 37,        // left arrow,
-        ROTATE_RIGHT: 39,       // right arrow
-    };
-    this.key.pressed[this.key.FORWARD_BOOST] = 0;
-    this.key.pressed[this.key.BACKWARD_BOOST] = 0;
-    this.key.pressed[this.key.ROTATE_RIGHT] = 0;
-    this.key.pressed[this.key.ROTATE_LEFT] = 0;
-    this.key.pressed[this.key.ROTATE_DOWN] = 0;
-    this.key.pressed[this.key.ROTATE_UP] = 0;
-    this.key.pressed[this.key.ROLL_LEFT] = 0;
-    this.key.pressed[this.key.ROLL_RIGHT] = 0;
+    this.keysPressed = {};
+    this.keysPressed[MOVE_FORWARD] = 0;
+    this.keysPressed[MOVE_BACKWARD] = 0;
+    this.keysPressed[ROTATE_LEFT] = 0;
+    this.keysPressed[ROTATE_RIGHT] = 0;
+    this.keysPressed[ROLL_RIGHT] = 0;
+    this.keysPressed[ROLL_FORWARD] = 0;
+    this.keysPressed[ROLL_BACKWARD] = 0;
+    this.keysPressed[ROLL_LEFT] = 0;
 
     this.model = model;
     this.view = view;
@@ -32,11 +30,11 @@ function Controller(model, view) {
 Controller.prototype.run = function() {
 
     const onKeyDown = (event) => {
-        this.key.pressed[event.keyCode] = 1;
+        this.keysPressed[event.keyCode] = 1;
     };
 
     const onKeyUp = (event) => {
-        this.key.pressed[event.keyCode] = 0;
+        this.keysPressed[event.keyCode] = 0;
     };
 
     const seconds = (runtime) => runtime / 1000;
@@ -47,23 +45,8 @@ Controller.prototype.run = function() {
     };
 
     const animateFrame = (timeStamp) => {
-        // todo kind of ugly.
-        this.model.update(
-            seconds(timeStamp - this.startTime),
-            [
-                // Order is critical
-                this.key.pressed[this.key.FORWARD_BOOST],
-                this.key.pressed[this.key.BACKWARD_BOOST],
-                this.key.pressed[this.key.ROLL_LEFT],
-                this.key.pressed[this.key.ROLL_RIGHT],
-                this.key.pressed[this.key.ROTATE_UP],
-                this.key.pressed[this.key.ROTATE_DOWN],
-                this.key.pressed[this.key.ROTATE_LEFT],
-                this.key.pressed[this.key.ROTATE_RIGHT]
-            ]);
-
+        this.model.update(seconds(timeStamp - this.startTime), this.keysPressed);
         this.view.draw();
-
         this.startTime = timeStamp;
         window.requestAnimationFrame(animateFrame);
     };

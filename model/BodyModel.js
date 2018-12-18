@@ -56,5 +56,5 @@ BodyModel.prototype.orbit = function (seconds) {
     this.modelMatrix = mat4RotatePreMul(this.modelMatrix, this.lastOrbitAngle, this.orbitalAxis);
     this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, this.parentBody.position);
     // update position vector
-    this.position = vec3CartesianFromHomogeneous(vec4MultiplyMat4([0, 0, 0, 1], this.modelMatrix));
+    this.position = vec3HomogeneousToCartesian(vec4MultiplyMat4([0, 0, 0, 1], this.modelMatrix));
 };
