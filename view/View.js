@@ -1,29 +1,29 @@
 "use strict";
 
+// Map indexes
+const blackMapIndex = 0;
+const sunMapIndex = 1;
+const earthDayMapIndex = 2;
+const earthSpecularMapIndex = 3;
+const earthNightMapIndex = 4;
+const earthCloudMapIndex = 5;
+const earthMoonMapIndex = 6;
+
+// Earth surface constants
+const earthDiffuseStrength = 1;
+const earthSpecularStrength = 0.5;
+const earthShininess = 10;
+const earthAmbientStrength = 0.5;
+const earthCloudDiffuseStrength = 1;
+const earthCloudAmbientStrength = 0.1;
+
+// Earth Moon surface constants
+const earthMoonDiffuseStrength = 1;
+const earthMoonSpecularStrength = 0.75;
+const earthMoonShininess = 1;
+const earthMoonAmbientStrength = 0.05;
+
 function View(canvas, model, callback) {
-
-    // Map indexes
-    const blackMapIndex = 0;
-    const sunMapIndex = 1;
-    const earthDayMapIndex = 2;
-    const earthSpecularMapIndex = 3;
-    const earthNightMapIndex = 4;
-    const earthCloudMapIndex = 5;
-    const earthMoonMapIndex = 6;
-
-    // Earth surface constants
-    const earthDiffuseStrength = 1;
-    const earthSpecularStrength = 0.5;
-    const earthShininess = 10;
-    const earthAmbientStrength = 0.5;
-    const earthCloudDiffuseStrength = 1;
-    const earthCloudAmbientStrength = 0.1;
-
-    // Earth Moon surface constants
-    const earthMoonDiffuseStrength = 1;
-    const earthMoonSpecularStrength = 0.75;
-    const earthMoonShininess = 1;
-    const earthMoonAmbientStrength = 0.05;
 
     const setUpShaderProgram = () => {
         this.shaderCtx = {};
@@ -62,7 +62,7 @@ function View(canvas, model, callback) {
     };
 
     const setUpProjectionMatrix = () => {
-        this.gl.uniformMatrix4fv(this.shaderCtx.uProjectionMatrixId, false, this.model.projectionMatrix);
+        this.gl.uniformMatrix4fv(this.shaderCtx.uProjectionMatrixId, false, this.model.camera.projectionMatrix);
     };
 
     const createTexture = (item, index) => {
@@ -145,14 +145,14 @@ function View(canvas, model, callback) {
 View.prototype.draw = function() {
 
     const setUpSunlight = () => {
-        this.gl.uniform3fv(this.shaderCtx.uSunPositionEyeId, this.model.sunPositionEye);
+        this.gl.uniform3fv(this.shaderCtx.uSunPositionEyeId, this.model.camera.sunPositionEye);
         this.gl.uniform3fv(this.shaderCtx.uSunlightColorId,[1, 1, 1]);
     };
 
     setUpSunlight();
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.bodyView.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.viewMatrix, this.sunSurface, false);
-    this.bodyView.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.viewMatrix, this.earthSurface, true);
-    this.bodyView.draw(this.gl, this.shaderCtx, this.model.earthMoon.modelMatrix, this.model.viewMatrix, this.earthMoonSurface, true);
+    this.bodyView.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.camera.viewMatrix, this.sunSurface, false);
+    this.bodyView.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.earthSurface, true);
+    this.bodyView.draw(this.gl, this.shaderCtx, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.earthMoonSurface, true);
 };

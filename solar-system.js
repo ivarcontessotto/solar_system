@@ -6,7 +6,7 @@ function main() {
     const canvas = document.getElementById("myCanvas");
     resizeCanvasToDisplaySize(canvas);
 
-    const model = new Model(canvas);
+    const model = new Model(canvas.width, canvas.height);
     const view = new View(canvas, model, callback);
     // Now await callback for when images are loaded.
     

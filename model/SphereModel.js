@@ -1,19 +1,19 @@
 "use strict";
 
-function BodyModel(radius, rotationSpeed, rotationAxis, parentBody, relPositionFromParent, orbitalSpeed, orbitalAxis) {
+function SphereModel(radius, rotationSpeed, rotationAxis, parentBody, relPositionFromParent, orbitalSpeed, orbitalAxis) {
 
     const calculateInitialPosition = () => {
         if (this.parentBody != null) {
-            return vec3.add(vec3.create(), this.parentBody.position, relPositionFromParent);
+            this.position = vec3.add(vec3.create(), this.parentBody.position, relPositionFromParent);
         }
         else {
             // If there is no parent body, the position is the origin.
-            return vec3.create();
+            this.position = vec3.create();
         }
     };
 
     const createModelMatrix = () => {
-        return mat4Multiply(
+        this.modelMatrix = mat4Multiply(
             mat4CreateTranslation(this.position),
             mat4CreateScaling([radius, radius, radius]));
     };
@@ -21,14 +21,14 @@ function BodyModel(radius, rotationSpeed, rotationAxis, parentBody, relPositionF
     this.roationSpeed = rotationSpeed;
     this.rotationAxis = rotationAxis;
     this.parentBody = parentBody;
-    this.position = calculateInitialPosition();
+    calculateInitialPosition();
     this.orbitalSpeed = orbitalSpeed;
     this.orbitalAxis = orbitalAxis;
     this.lastOrbitAngle = 0;
-    this.modelMatrix = createModelMatrix();
+    createModelMatrix();
 }
 
-BodyModel.prototype.rotateAroundOwnAxis = function(seconds) {
+SphereModel.prototype.rotateAroundOwnAxis = function(seconds) {
     const angle = this.roationSpeed * seconds;
     if (angle <= 0) {
         return;
@@ -39,7 +39,7 @@ BodyModel.prototype.rotateAroundOwnAxis = function(seconds) {
     this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, this.position);
 };
 
-BodyModel.prototype.orbit = function (seconds) {
+SphereModel.prototype.orbit = function (seconds) {
     if (this.parentBody === null) {
         return;
     }
@@ -49,7 +49,7 @@ BodyModel.prototype.orbit = function (seconds) {
         return;
     }
 
-    // first rotate around origin same as parent to catch up
+    // first rotate around origin same as parent to catch UP
     this.modelMatrix = mat4RotatePreMul(this.modelMatrix, this.parentBody.lastOrbitAngle, this.parentBody.orbitalAxis);
     // orbit around parent
     this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, vec3MultiplyScalar(this.parentBody.position, -1));

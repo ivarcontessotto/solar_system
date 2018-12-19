@@ -1,5 +1,5 @@
 /*
- * Set of utilities for setting up in WebGL
+ * Set of utilities for setting UP in WebGL
  *
  * Author: 		Thomas Koller
  * Adapted by: 	Ivar Contessotto
@@ -94,7 +94,7 @@ function createProgram(gl, vertexShader, fragmentShader) {
 /**
  * Load a external resource synchronously from an URL.
  *
- * If the URL ends up specifying a file (when the original HTML is read from the file system) then
+ * If the URL ends UP specifying a file (when the original HTML is read from the file system) then
  * some security settings of the browser might have been changed. If there is a local web server,
  * there should not be any problem.
  *
