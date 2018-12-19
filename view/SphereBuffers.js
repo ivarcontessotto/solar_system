@@ -1,6 +1,6 @@
 "use strict";
 
-function BodyView(gl, sectorCount, stackCount) {
+function SphereBuffers(gl, sectorCount, stackCount) {
 
     const initArrayBuffers = () => {
         const vertexPositions = [];
@@ -33,23 +33,17 @@ function BodyView(gl, sectorCount, stackCount) {
                 textureCoordinates.push(i / stackCount);
             }
         }
-        const vertexPositionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+       this.vertexPositionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
 
-        const vertexNormalBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, vertexNormalBuffer);
+        this.vertexNormalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
 
-        const textureCoordinateBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordinateBuffer);
+        this.textureCoordinateBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordinateBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
-
-        return {
-            vertexPositions: vertexPositionBuffer,
-            vertexNormals: vertexNormalBuffer,
-            textureCoordinates: textureCoordinateBuffer
-        };
     };
 
     const initIndexBuffer = () => {
@@ -71,66 +65,30 @@ function BodyView(gl, sectorCount, stackCount) {
                 }
             }
         }
-        const buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
+        this.indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
-        return buffer;
     };
 
-    const buffers = initArrayBuffers();
-    this.vertexPositionBuffer = buffers.vertexPositions;
-    this.vertexNormalBuffer = buffers.vertexNormals;
-    this.textureCoordinateBuffer = buffers.textureCoordinates;
-    this.indexBuffer = initIndexBuffer();
+    initArrayBuffers();
+    initIndexBuffer();
     this.numberOfTriangles = (stackCount - 1) * sectorCount * 2;
 }
 
-BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, surface, enableShading) {
-    // todo omg cleanup this ugly function
-
-    gl.uniform1i(shaderCtx.uRenderShadowMapId, 0);
-
+SphereBuffers.prototype.draw = function(gl, shaderCtx, enableShading) {
+    
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
     gl.vertexAttribPointer(shaderCtx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(shaderCtx.aVertexPositionId);
-
-    const modelViewMatrix = mat4Multiply(vieMatrix, modelMatrix);
-    gl.uniformMatrix4fv(shaderCtx.uModelViewMatrixId, false, modelViewMatrix);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordinateBuffer);
     gl.vertexAttribPointer(shaderCtx.aTextureCoordinateId, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(shaderCtx.aTextureCoordinateId);
 
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, surface.diffuseMap);
-    gl.uniform1i(shaderCtx.uDiffuseMapId, 0);
-
-    gl.activeTexture(gl.TEXTURE0 + 1);
-    gl.bindTexture(gl.TEXTURE_2D, surface.specularMap);
-    gl.uniform1i(shaderCtx.uSpecularMapId, 1);
-
-    gl.activeTexture(gl.TEXTURE0 + 2);
-    gl.bindTexture(gl.TEXTURE_2D, surface.ambientMap);
-    gl.uniform1i(shaderCtx.uAmbientMapId, 2);
-
-    gl.activeTexture(gl.TEXTURE0 + 3);
-    gl.bindTexture(gl.TEXTURE_2D, surface.cloudMap);
-    gl.uniform1i(shaderCtx.uCloudMapId, 3);
-
-    gl.uniform4f(shaderCtx.uPhongStrengthId, surface.phongStrength[0], surface.phongStrength[1], surface.phongStrength[2], surface.phongStrength[3]);
-    gl.uniform2f(shaderCtx.uCloudStrengthId, surface.cloudStrength[0], surface.cloudStrength[1]);
-
     if (enableShading) {
-        gl.uniform1i(shaderCtx.uEnableShadingId, 1);
-
-        gl.uniformMatrix3fv(shaderCtx.uNormalMatrixId, false, mat3NormalMatrixFromMat4(modelViewMatrix));
-
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
         gl.vertexAttribPointer(shaderCtx.aVertexNormalId, 3, gl.FLOAT, false, 0, 0);
         gl.enableVertexAttribArray(shaderCtx.aVertexNormalId);
-    }
-    else {
-        gl.uniform1i(shaderCtx.uEnableShadingId, 0);
     }
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
@@ -139,18 +97,4 @@ BodyView.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, surfac
     gl.disableVertexAttribArray(shaderCtx.aVertexPositionId);
     gl.disableVertexAttribArray(shaderCtx.aTextureCoordinateId);
     gl.disableVertexAttribArray(shaderCtx.aVertexNormalId);
-};
-
-BodyView.prototype.drawShadowMap = function(gl, shaderCtx, modelMatrix, lightMatrix) {
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-    gl.vertexAttribPointer(shaderCtx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(shaderCtx.aVertexPositionId);
-
-    const modelLightMatrix = mat4Multiply(lightMatrix, modelMatrix);
-    gl.uniformMatrix4fv(shaderCtx.uModelLightMatrixId, false, modelLightMatrix);
-
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-    gl.drawElements(gl.TRIANGLES, this.numberOfTriangles * 3 ,gl.UNSIGNED_SHORT, 0);
-
-    gl.disableVertexAttribArray(shaderCtx.aVertexPositionId);
 };

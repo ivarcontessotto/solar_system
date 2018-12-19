@@ -133,7 +133,7 @@ function View(canvas, model, callback) {
     this.gl = createGLContext(canvas);
     console.log(this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
     this.model = model;
-    this.bodyView = new BodyView(this.gl, 50, 50);
+    this.rendering = new Rendering(new SphereBuffers(this.gl, 50, 50));
     setUpShaderProgram();
     setUpHiddenSurfaceRemoval();
     setUpProjectionMatrix();
@@ -152,7 +152,7 @@ View.prototype.draw = function() {
     setUpSunlight();
 
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    this.bodyView.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.camera.viewMatrix, this.sunSurface, false);
-    this.bodyView.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.earthSurface, true);
-    this.bodyView.draw(this.gl, this.shaderCtx, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.earthMoonSurface, true);
+    this.rendering.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.camera.viewMatrix, this.sunSurface, false);
+    this.rendering.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.earthSurface, true);
+    this.rendering.draw(this.gl, this.shaderCtx, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.earthMoonSurface, true);
 };
