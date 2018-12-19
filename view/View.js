@@ -105,7 +105,9 @@ function View(canvas, model, callback) {
     this.model = model;
     this.gl = createGLContext(canvas);
     console.log("MAX TEXTURE IMAGE UNITS: ", this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
-    this.rendering = new Rendering(this.gl, new SphereBuffers(this.gl, 50, 50), this.model.camera.projectionMatrix);
+    const sphereBuffers = new SphereBuffers(this.gl, 50, 50);
+    this.rendering = new Rendering(this.gl, sphereBuffers, this.model.camera.projectionMatrix);
+    this.renderingUnlit = new RenderingUnlit(this.gl, sphereBuffers, this.model.camera.projectionMatrix);
     setUpHiddenSurfaceRemoval(); // todo stays here probably. but lets see what shadow mapping needs
     this.gl.clearColor(0, 0, 0, 1); // todo might have to move down to draw method. maybe shadow map does not work if it stays here
     // This needs to be done last because images are loaded asynchronously in browser!
@@ -118,7 +120,7 @@ View.prototype.draw = function() {
     // todo stays here. maybe have to set different clear colors for shadow map and normal rendering
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     // todo stays here but adapt paramerters
-    this.rendering.draw(this.model.sun.modelMatrix, this.model.camera.viewMatrix, this.sunSurface, false, null);
-    this.rendering.draw(this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.earthSurface, true, this.model.camera.sunPositionEye);
-    this.rendering.draw(this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.earthMoonSurface, true, this.model.camera.sunPositionEye);
+    this.renderingUnlit.draw(this.sunSurface, this.model.sun.modelMatrix, this.model.camera.viewMatrix);
+    this.rendering.draw(this.earthSurface, this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye);
+    this.rendering.draw(this.earthMoonSurface, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye);
 };

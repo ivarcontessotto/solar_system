@@ -41,11 +41,7 @@ function setupProgram(gl, vertexShaderFileName, fragmentShaderFileName) {
     if (vertexShader === null || fragmentShader === null) {
         return null;
     }
-    const shaderProgram = createProgram(gl, vertexShader, fragmentShader);
-    if (shaderProgram != null) {
-        gl.useProgram(shaderProgram);
-    }
-    return shaderProgram;
+    return createProgram(gl, vertexShader, fragmentShader);
 }
 
 /**

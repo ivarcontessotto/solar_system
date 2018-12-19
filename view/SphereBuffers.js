@@ -70,31 +70,43 @@ function SphereBuffers(gl, sectorCount, stackCount) {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
     };
 
+    this.gl = gl;
     initArrayBuffers();
     initIndexBuffer();
     this.numberOfTriangles = (stackCount - 1) * sectorCount * 2;
 }
 
-SphereBuffers.prototype.draw = function(gl, shaderCtx, enableShading) {
-    
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexPositionBuffer);
-    gl.vertexAttribPointer(shaderCtx.aVertexPositionId, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(shaderCtx.aVertexPositionId);
+SphereBuffers.prototype.drawWithNormals = function(aVertexPositionId, aTextureCoordinateId, aVertexNormalId) {
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.textureCoordinateBuffer);
-    gl.vertexAttribPointer(shaderCtx.aTextureCoordinateId, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(shaderCtx.aTextureCoordinateId);
+    enableAttribute(this.gl, this.vertexPositionBuffer, aVertexPositionId, 3);
+    enableAttribute(this.gl, this.textureCoordinateBuffer, aTextureCoordinateId, 2);
+    enableAttribute(this.gl, this.vertexNormalBuffer, aVertexNormalId, 3);
 
-    if (enableShading) {
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexNormalBuffer);
-        gl.vertexAttribPointer(shaderCtx.aVertexNormalId, 3, gl.FLOAT, false, 0, 0);
-        gl.enableVertexAttribArray(shaderCtx.aVertexNormalId);
-    }
+    drawElements(this.gl, this.indexBuffer, this.numberOfTriangles * 3);
 
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-    gl.drawElements(gl.TRIANGLES, this.numberOfTriangles * 3 ,gl.UNSIGNED_SHORT, 0);
-
-    gl.disableVertexAttribArray(shaderCtx.aVertexPositionId);
-    gl.disableVertexAttribArray(shaderCtx.aTextureCoordinateId);
-    gl.disableVertexAttribArray(shaderCtx.aVertexNormalId);
+    this.gl.disableVertexAttribArray(aVertexPositionId);
+    this.gl.disableVertexAttribArray(aTextureCoordinateId);
+    this.gl.disableVertexAttribArray(aVertexNormalId);
 };
+
+SphereBuffers.prototype.drawWithoutNormals = function(aVertexPositionId, aTextureCoordinateId) {
+
+    enableAttribute(this.gl, this.vertexPositionBuffer, aVertexPositionId, 3);
+    enableAttribute(this.gl, this.textureCoordinateBuffer, aTextureCoordinateId, 2);
+
+    drawElements(this.gl, this.indexBuffer, this.numberOfTriangles * 3);
+
+    this.gl.disableVertexAttribArray(aVertexPositionId);
+    this.gl.disableVertexAttribArray(aTextureCoordinateId);
+};
+
+function enableAttribute(gl, attributeBuffer, attributeId, size) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, attributeBuffer);
+    gl.vertexAttribPointer(attributeId, size, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(attributeId);
+}
+
+function drawElements(gl, indexBuffer, count) {
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+    gl.drawElements(gl.TRIANGLES, count, gl.UNSIGNED_SHORT, 0);
+}
