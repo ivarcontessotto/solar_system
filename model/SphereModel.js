@@ -1,6 +1,6 @@
 "use strict";
 
-function SphereModel(radius, rotationSpeed, rotationAxis, parentBody, relPositionFromParent, orbitalSpeed, orbitalAxis) {
+function SphereModel(radius, rotationSpeed, rotationAxis, parentModel, relPositionFromParent, orbitalSpeed, orbitalAxis) {
 
     const calculateInitialPosition = () => {
         if (this.parentBody != null) {
@@ -20,7 +20,7 @@ function SphereModel(radius, rotationSpeed, rotationAxis, parentBody, relPositio
 
     this.roationSpeed = rotationSpeed;
     this.rotationAxis = rotationAxis;
-    this.parentBody = parentBody;
+    this.parentBody = parentModel;
     calculateInitialPosition();
     this.orbitalSpeed = orbitalSpeed;
     this.orbitalAxis = orbitalAxis;
