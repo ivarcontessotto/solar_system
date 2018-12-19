@@ -26,35 +26,7 @@ const earthMoonAmbientStrength = 0.05;
 
 function View(canvas, model, callback) {
 
-    // todo belongs into rendering classes
-    const setUpShaderProgram = () => {
-        this.shaderCtx = {};
-        this.shaderCtx.shaderProgram = setupProgram(this.gl, "view/vertex-shader.glsl", "view/fragment-shader.glsl");
-
-        this.shaderCtx.aVertexPositionId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexPosition");
-        this.shaderCtx.uModelViewMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uModelViewMatrix");
-        this.shaderCtx.uProjectionMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uProjectionMatrix");
-
-        this.shaderCtx.aTextureCoordinateId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexTextureCoordinate");
-        this.shaderCtx.uDiffuseMapId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uDiffuseMap");
-        this.shaderCtx.uSpecularMapId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uSpecularMap");
-        this.shaderCtx.uAmbientMapId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uAmbientMap");
-        this.shaderCtx.uCloudMapId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uCloudMap");
-
-        this.shaderCtx.uPhongStrengthId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uPhongStrength");
-        this.shaderCtx.uCloudStrengthId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uCloudStrength");
-
-        this.shaderCtx.uEnableShadingId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uEnableShading");
-        this.shaderCtx.aVertexNormalId = this.gl.getAttribLocation(this.shaderCtx.shaderProgram, "aVertexNormal");
-        this.shaderCtx.uNormalMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uNormalMatrix");
-        this.shaderCtx.uSunPositionEyeId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uSunPositionEye");
-        this.shaderCtx.uSunlightColorId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uSunlightColor");
-
-        this.shaderCtx.uRenderShadowMapId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uRenderShadowMap");
-        this.shaderCtx.uModelLightMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uModelLightMatrix");
-    };
-
-    // todo this may stay here. same for all rendering types
+    // todo this may stay here. maybe same for all rendering types. but not sure. lets see how shadow mapping works
     const setUpHiddenSurfaceRemoval = () => {
         // back-face culling
         this.gl.frontFace(this.gl.CCW);
@@ -62,11 +34,6 @@ function View(canvas, model, callback) {
         this.gl.enable(this.gl.CULL_FACE);
         // depth buffer
         this.gl.enable(this.gl.DEPTH_TEST);
-    };
-
-    // todo has to move to rendering class because will not always  be the same for all rendering types
-    const setUpProjectionMatrix = () => {
-        this.gl.uniformMatrix4fv(this.shaderCtx.uProjectionMatrixId, false, this.model.camera.projectionMatrix);
     };
 
     const createTexture = (item, index) => {
@@ -105,7 +72,6 @@ function View(canvas, model, callback) {
             [0, 0]);
     };
 
-    // todo image loading stays here
     let imagesToLoad = 0;
 
     const onImageLoad = () => {
@@ -139,31 +105,20 @@ function View(canvas, model, callback) {
     this.model = model;
     this.gl = createGLContext(canvas);
     console.log("MAX TEXTURE IMAGE UNITS: ", this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
-    this.rendering = new Rendering(new SphereBuffers(this.gl, 50, 50));
-    setUpShaderProgram(); // todo move to rendering classes
-    setUpHiddenSurfaceRemoval(); // todo stays here
-    setUpProjectionMatrix(); // todo move to rendering classes
+    this.rendering = new Rendering(this.gl, new SphereBuffers(this.gl, 50, 50), this.model.camera.projectionMatrix);
+    setUpHiddenSurfaceRemoval(); // todo stays here probably. but lets see what shadow mapping needs
     this.gl.clearColor(0, 0, 0, 1); // todo might have to move down to draw method. maybe shadow map does not work if it stays here
     // This needs to be done last because images are loaded asynchronously in browser!
-    loadTextureImages(); // todo stays here
+    loadTextureImages();
 }
 
 View.prototype.draw = function() {
-
-    // todo probably move to renderings that actually do lighting and need to know sunlight pos and color
-    const setUpSunlight = () => {
-        this.gl.uniform3fv(this.shaderCtx.uSunPositionEyeId, this.model.camera.sunPositionEye);
-        this.gl.uniform3fv(this.shaderCtx.uSunlightColorId,[1, 1, 1]);
-    };
-
-    setUpSunlight();
-
     // todo render shadowmap first
 
     // todo stays here. maybe have to set different clear colors for shadow map and normal rendering
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     // todo stays here but adapt paramerters
-    this.rendering.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.camera.viewMatrix, this.sunSurface, false);
-    this.rendering.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.earthSurface, true);
-    this.rendering.draw(this.gl, this.shaderCtx, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.earthMoonSurface, true);
+    this.rendering.draw(this.model.sun.modelMatrix, this.model.camera.viewMatrix, this.sunSurface, false, null);
+    this.rendering.draw(this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.earthSurface, true, this.model.camera.sunPositionEye);
+    this.rendering.draw(this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.earthMoonSurface, true, this.model.camera.sunPositionEye);
 };
