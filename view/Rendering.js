@@ -6,7 +6,7 @@ function Rendering(buffers) {
 
 Rendering.prototype.draw = function(gl, shaderCtx, modelMatrix, vieMatrix, surface, enableShading) {
 
-    // todo omg cleanup this ugly function
+    // todo split different rendering methods to its own classes
 
     gl.uniform1i(shaderCtx.uRenderShadowMapId, 0);
 

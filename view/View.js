@@ -1,5 +1,6 @@
 "use strict";
 
+// todo Materials
 // Map indexes
 const blackMapIndex = 0;
 const sunMapIndex = 1;
@@ -25,6 +26,7 @@ const earthMoonAmbientStrength = 0.05;
 
 function View(canvas, model, callback) {
 
+    // todo belongs into rendering classes
     const setUpShaderProgram = () => {
         this.shaderCtx = {};
         this.shaderCtx.shaderProgram = setupProgram(this.gl, "view/vertex-shader.glsl", "view/fragment-shader.glsl");
@@ -52,6 +54,7 @@ function View(canvas, model, callback) {
         this.shaderCtx.uModelLightMatrixId = this.gl.getUniformLocation(this.shaderCtx.shaderProgram, "uModelLightMatrix");
     };
 
+    // todo this may stay here. same for all rendering types
     const setUpHiddenSurfaceRemoval = () => {
         // back-face culling
         this.gl.frontFace(this.gl.CCW);
@@ -61,6 +64,7 @@ function View(canvas, model, callback) {
         this.gl.enable(this.gl.DEPTH_TEST);
     };
 
+    // todo has to move to rendering class because will not always  be the same for all rendering types
     const setUpProjectionMatrix = () => {
         this.gl.uniformMatrix4fv(this.shaderCtx.uProjectionMatrixId, false, this.model.camera.projectionMatrix);
     };
@@ -74,6 +78,7 @@ function View(canvas, model, callback) {
         this.gl.generateMipmap(this.gl.TEXTURE_2D);
     };
 
+    // todo stays here, but use different material classes that fit the specific use
     const initBodySurfaceAttributes = () => {
         this.sunSurface = new BodySurfaceAttribute(
             this.textureItems[sunMapIndex].texture,
@@ -100,6 +105,7 @@ function View(canvas, model, callback) {
             [0, 0]);
     };
 
+    // todo image loading stays here
     let imagesToLoad = 0;
 
     const onImageLoad = () => {
@@ -130,20 +136,21 @@ function View(canvas, model, callback) {
         this.textureItems.forEach(loadImage);
     };
 
-    this.gl = createGLContext(canvas);
-    console.log(this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
     this.model = model;
+    this.gl = createGLContext(canvas);
+    console.log("MAX TEXTURE IMAGE UNITS: ", this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
     this.rendering = new Rendering(new SphereBuffers(this.gl, 50, 50));
-    setUpShaderProgram();
-    setUpHiddenSurfaceRemoval();
-    setUpProjectionMatrix();
-    this.gl.clearColor(0, 0, 0, 1);
+    setUpShaderProgram(); // todo move to rendering classes
+    setUpHiddenSurfaceRemoval(); // todo stays here
+    setUpProjectionMatrix(); // todo move to rendering classes
+    this.gl.clearColor(0, 0, 0, 1); // todo might have to move down to draw method. maybe shadow map does not work if it stays here
     // This needs to be done last because images are loaded asynchronously in browser!
-    loadTextureImages();
+    loadTextureImages(); // todo stays here
 }
 
 View.prototype.draw = function() {
 
+    // todo probably move to renderings that actually do lighting and need to know sunlight pos and color
     const setUpSunlight = () => {
         this.gl.uniform3fv(this.shaderCtx.uSunPositionEyeId, this.model.camera.sunPositionEye);
         this.gl.uniform3fv(this.shaderCtx.uSunlightColorId,[1, 1, 1]);
@@ -151,7 +158,11 @@ View.prototype.draw = function() {
 
     setUpSunlight();
 
+    // todo render shadowmap first
+
+    // todo stays here. maybe have to set different clear colors for shadow map and normal rendering
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+    // todo stays here but adapt paramerters
     this.rendering.draw(this.gl, this.shaderCtx, this.model.sun.modelMatrix, this.model.camera.viewMatrix, this.sunSurface, false);
     this.rendering.draw(this.gl, this.shaderCtx, this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.earthSurface, true);
     this.rendering.draw(this.gl, this.shaderCtx, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.earthMoonSurface, true);
