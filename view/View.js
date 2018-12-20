@@ -3,17 +3,28 @@
 // todo move this
 const SHADOWMAP_RESOLUTION = 2048;
 const LIGHT_VERTICAL_FIELD_OF_VIEW = Math.PI/2;
-const LIGHT_Z_NEAR = 1;
+const LIGHT_Z_NEAR = 500;
 const LIGHT_Z_FAR = 10000;
 const PROJECTION_MATRIX_LIGHT = mat4CreateProjection(LIGHT_VERTICAL_FIELD_OF_VIEW, SHADOWMAP_RESOLUTION / SHADOWMAP_RESOLUTION, LIGHT_Z_NEAR, LIGHT_Z_FAR);
 
 // View
 const LIGHT_POSITION = [0, 0, 0]; // In world coordinates
-const LIGHT_LOOK_AT = [1, 0, 0]; // In world coordinates
 const LIGHT_UP = [0, 1, 0]; // In world coordinates
-const VIEW_MATRIX_LIGHT = mat4CreateLookAt(LIGHT_POSITION, LIGHT_LOOK_AT, LIGHT_UP);
+const VIEW_MATRIX_LIGHT_POS_X = mat4CreateLookAt(LIGHT_POSITION, [1, 0, 0], LIGHT_UP);
+const VIEW_MATRIX_LIGHT_NEG_X = mat4CreateLookAt(LIGHT_POSITION, [-1, 0, 0], LIGHT_UP);
+const VIEW_MATRIX_LIGHT_POS_Z = mat4CreateLookAt(LIGHT_POSITION, [0, 0, 1], LIGHT_UP);
+const VIEW_MATRIX_LIGHT_NEG_Z = mat4CreateLookAt(LIGHT_POSITION, [0, 0, -1], LIGHT_UP);
 
-const LIGHT_PROJECTION_VIEW_MATRIX = mat4Multiply(PROJECTION_MATRIX_LIGHT, VIEW_MATRIX_LIGHT);
+const LIGHT_PROJECTION_VIEW_MATRIX_POS_X = mat4Multiply(PROJECTION_MATRIX_LIGHT, VIEW_MATRIX_LIGHT_POS_X);
+const LIGHT_PROJECTION_VIEW_MATRIX_NEG_X = mat4Multiply(PROJECTION_MATRIX_LIGHT, VIEW_MATRIX_LIGHT_NEG_X);
+const LIGHT_PROJECTION_VIEW_MATRIX_POS_Z = mat4Multiply(PROJECTION_MATRIX_LIGHT, VIEW_MATRIX_LIGHT_POS_Z);
+const LIGHT_PROJECTION_VIEW_MATRIX_NEG_Z = mat4Multiply(PROJECTION_MATRIX_LIGHT, VIEW_MATRIX_LIGHT_NEG_Z);
+const LIGHT_PROJECTION_VIEW_MATRICES = [
+    LIGHT_PROJECTION_VIEW_MATRIX_POS_X,
+    LIGHT_PROJECTION_VIEW_MATRIX_NEG_X,
+    LIGHT_PROJECTION_VIEW_MATRIX_POS_Z,
+    LIGHT_PROJECTION_VIEW_MATRIX_NEG_Z
+];
 
 // todo Materials
 // Map indexes
@@ -29,7 +40,7 @@ const earthMoonMapIndex = 6;
 const earthDiffuseStrength = 1;
 const earthSpecularStrength = 0.5;
 const earthShininess = 10;
-const earthAmbientStrength = 0.5;
+const earthAmbientStrength = 0.75;
 const earthCloudDiffuseStrength = 1;
 const earthCloudAmbientStrength = 0.1;
 
@@ -121,19 +132,34 @@ function View(canvas, model, callback) {
     this.gl = createGLContext(canvas);
     console.log("MAX TEXTURE IMAGE UNITS: ", this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
     const sphereBuffers = new SphereBuffers(this.gl, 50, 50);
-    this.renderingShadowmap = new RenderingShadowmap(this.gl, sphereBuffers, SHADOWMAP_RESOLUTION, SHADOWMAP_RESOLUTION, LIGHT_PROJECTION_VIEW_MATRIX); // todo get those params
+    this.renderingShadowmapPositiveX = new RenderingShadowmap(this.gl, sphereBuffers, SHADOWMAP_RESOLUTION, SHADOWMAP_RESOLUTION, LIGHT_PROJECTION_VIEW_MATRIX_POS_X);
+    this.renderingShadowmapNegativeX = new RenderingShadowmap(this.gl, sphereBuffers, SHADOWMAP_RESOLUTION, SHADOWMAP_RESOLUTION, LIGHT_PROJECTION_VIEW_MATRIX_NEG_X);
+    this.renderingShadowmapPositiveZ = new RenderingShadowmap(this.gl, sphereBuffers, SHADOWMAP_RESOLUTION, SHADOWMAP_RESOLUTION, LIGHT_PROJECTION_VIEW_MATRIX_POS_Z);
+    this.renderingShadowmapNegativeZ = new RenderingShadowmap(this.gl, sphereBuffers, SHADOWMAP_RESOLUTION, SHADOWMAP_RESOLUTION, LIGHT_PROJECTION_VIEW_MATRIX_NEG_Z);
     this.renderingUnlit = new RenderingUnlit(this.gl, sphereBuffers, this.model.camera.projectionMatrix);
-    this.rendering = new Rendering(this.gl, sphereBuffers, this.model.camera.projectionMatrix, LIGHT_PROJECTION_VIEW_MATRIX);
+    this.rendering = new Rendering(this.gl, sphereBuffers, this.model.camera.projectionMatrix, LIGHT_PROJECTION_VIEW_MATRICES);
     setUpHiddenSurfaceRemoval(); // todo stays here probably. but lets see what shadow mapping needs
     // This needs to be done last because images are loaded asynchronously in browser!
     loadTextureImages();
 }
 
 View.prototype.draw = function() {
-    this.renderingShadowmap.draw(this.model.earth.modelMatrix, true);
-    const shadowmap = this.renderingShadowmap.draw(this.model.earthMoon.modelMatrix, false);
+    // Render shadowmap
+    const shadowmaps = [];
+
+    this.renderingShadowmapPositiveX.draw(this.model.earth.modelMatrix, true);
+    shadowmaps[0] = this.renderingShadowmapPositiveX.draw(this.model.earthMoon.modelMatrix, false);
+
+    this.renderingShadowmapNegativeX.draw(this.model.earth.modelMatrix, true);
+    shadowmaps[1] = this.renderingShadowmapNegativeX.draw(this.model.earthMoon.modelMatrix, false);
+
+    this.renderingShadowmapPositiveZ.draw(this.model.earth.modelMatrix, true);
+    shadowmaps[2] = this.renderingShadowmapPositiveZ.draw(this.model.earthMoon.modelMatrix, false);
+
+    this.renderingShadowmapNegativeZ.draw(this.model.earth.modelMatrix, true);
+    shadowmaps[3] = this.renderingShadowmapNegativeZ.draw(this.model.earthMoon.modelMatrix, false);
 
     this.renderingUnlit.draw(this.sunSurface, this.model.sun.modelMatrix, this.model.camera.viewMatrix, true);
-    this.rendering.draw(this.earthSurface, this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmap, false);
-    this.rendering.draw(this.earthMoonSurface, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmap, false);
+    this.rendering.draw(this.earthSurface, this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
+    this.rendering.draw(this.earthMoonSurface, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
 };

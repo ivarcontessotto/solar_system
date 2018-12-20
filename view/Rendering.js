@@ -1,6 +1,6 @@
 "use strict";
 
-function Rendering(gl, buffers, projectionMatrix, lightProjectionViewMatrix) {
+function Rendering(gl, buffers, projectionMatrix, lightProjectionViewMatrices) {
 
     // todo split into different rendering classes
     const setUpShaderProgram = () => {
@@ -25,19 +25,25 @@ function Rendering(gl, buffers, projectionMatrix, lightProjectionViewMatrix) {
         this.uSunPositionEyeId = this.gl.getUniformLocation(this.shaderProgram, "uSunPositionEye");
         this.uSunlightColorId = this.gl.getUniformLocation(this.shaderProgram, "uSunlightColor");
 
-        this.uShadowmapId = this.gl.getUniformLocation(this.shaderProgram, "uShadowmap");
-        this.uLightSpaceMatrixId = this.gl.getUniformLocation(this.shaderProgram, "uLightSpaceMatrix");
+        this.uShadowmapPositiveXId = this.gl.getUniformLocation(this.shaderProgram, "uShadowmapPositiveX");
+        this.uShadowmapNegativeXId = this.gl.getUniformLocation(this.shaderProgram, "uShadowmapNegativeX");
+        this.uShadowmapPositiveZId = this.gl.getUniformLocation(this.shaderProgram, "uShadowmapPositiveZ");
+        this.uShadowmapNegativeZId = this.gl.getUniformLocation(this.shaderProgram, "uShadowmapNegativeZ");
+        this.uLightSpaceMatrixPositiveXId = this.gl.getUniformLocation(this.shaderProgram, "uLightSpaceMatrixPositiveX");
+        this.uLightSpaceMatrixNegativeXId = this.gl.getUniformLocation(this.shaderProgram, "uLightSpaceMatrixNegativeX");
+        this.uLightSpaceMatrixPositiveZId = this.gl.getUniformLocation(this.shaderProgram, "uLightSpaceMatrixPositiveZ");
+        this.uLightSpaceMatrixNegativeZId = this.gl.getUniformLocation(this.shaderProgram, "uLightSpaceMatrixNegativeZ");
     };
 
     // todo will not always  be the same for all rendering types
     this.gl = gl;
     this.buffers = buffers;
-    this.lightProjectionViewMatrix = lightProjectionViewMatrix;
+    this.lightProjectionViewMatrices = lightProjectionViewMatrices;
     setUpShaderProgram();
     this.gl.uniformMatrix4fv(this.uProjectionMatrixId, false, projectionMatrix);
 }
 
-Rendering.prototype.draw = function(surface, modelMatrix, viewMatrix, sunPositionEye, shadowmap, clearFramebuffer) {
+Rendering.prototype.draw = function(surface, modelMatrix, viewMatrix, sunPositionEye, shadowmaps, clearFramebuffer) {
 
     // todo split different rendering methods to its own classes
 
@@ -76,10 +82,24 @@ Rendering.prototype.draw = function(surface, modelMatrix, viewMatrix, sunPositio
     this.gl.uniformMatrix3fv(this.uNormalMatrixId, false, mat3NormalMatrixFromMat4(modelViewMatrix));
 
     this.gl.activeTexture(this.gl.TEXTURE0 + 4);
-    this.gl.bindTexture(this.gl.TEXTURE_2D, shadowmap);
-    this.gl.uniform1i(this.uShadowmapId, 4);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, shadowmaps[0]);
+    this.gl.uniform1i(this.uShadowmapPositiveXId, 4);
+    this.gl.uniformMatrix4fv(this.uLightSpaceMatrixPositiveXId, false, mat4Multiply(this.lightProjectionViewMatrices[0], modelMatrix));
 
-    this.gl.uniformMatrix4fv(this.uLightSpaceMatrixId, false, mat4Multiply(this.lightProjectionViewMatrix, modelMatrix));
+    this.gl.activeTexture(this.gl.TEXTURE0 + 5);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, shadowmaps[1]);
+    this.gl.uniform1i(this.uShadowmapNegativeXId, 5);
+    this.gl.uniformMatrix4fv(this.uLightSpaceMatrixNegativeXId, false, mat4Multiply(this.lightProjectionViewMatrices[1], modelMatrix));
+
+    this.gl.activeTexture(this.gl.TEXTURE0 + 6);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, shadowmaps[2]);
+    this.gl.uniform1i(this.uShadowmapPositiveZId, 6);
+    this.gl.uniformMatrix4fv(this.uLightSpaceMatrixPositiveZId, false, mat4Multiply(this.lightProjectionViewMatrices[2], modelMatrix));
+
+    this.gl.activeTexture(this.gl.TEXTURE0 + 7);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, shadowmaps[3]);
+    this.gl.uniform1i(this.uShadowmapNegativeZId, 7);
+    this.gl.uniformMatrix4fv(this.uLightSpaceMatrixNegativeZId, false, mat4Multiply(this.lightProjectionViewMatrices[3], modelMatrix));
 
     this.buffers.drawAll(this.aVertexPositionId, this.aTextureCoordinateId, this.aVertexNormalId);
 };

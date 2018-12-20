@@ -14,15 +14,39 @@ uniform vec3 uSunPositionEye;
 varying vec3 vFragmentPositionEye;
 varying vec3 vFragmentNormalEye;
 
-uniform sampler2D uShadowmap;
-varying vec4 vFragmentPositionLightspace;
+uniform sampler2D uShadowmapPositiveX;
+uniform sampler2D uShadowmapNegativeX;
+uniform sampler2D uShadowmapPositiveZ;
+uniform sampler2D uShadowmapNegativeZ;
+
+varying vec4 vFragmentPositionLightspacePositiveX;
+varying vec4 vFragmentPositionLightspaceNegativeX;
+varying vec4 vFragmentPositionLightspacePositiveZ;
+varying vec4 vFragmentPositionLightspaceNegativeZ;
+
+
+bool isInShadow(vec4 fragmentPositionLightspace, sampler2D shadowMap) {
+    vec3 mapCoordinates = fragmentPositionLightspace.xyz / fragmentPositionLightspace.w;
+    if (any(greaterThan(abs(mapCoordinates), vec3(1.0)))) {
+        return false;
+    }
+    mapCoordinates = mapCoordinates * 0.5 + 0.5;
+    float closestDepth = texture2D(shadowMap, mapCoordinates.xy).r;
+    float currentDepth = mapCoordinates.z;
+    if ((currentDepth - 0.0001) > closestDepth) {
+        return true;
+    }
+    return false;
+}
 
 float calculateShadowFactor() {
-    vec3 coordinates = vFragmentPositionLightspace.xyz / vFragmentPositionLightspace.w;
-    coordinates = coordinates * 0.5 + 0.5;
-    float closestDepth = texture2D(uShadowmap, coordinates.xy).r;
-    float currentDepth = coordinates.z;
-    return currentDepth - 0.0001 > closestDepth ? 1.0 : 0.0;
+    if (isInShadow(vFragmentPositionLightspacePositiveX, uShadowmapPositiveX) ||
+        isInShadow(vFragmentPositionLightspaceNegativeX, uShadowmapNegativeX) ||
+        isInShadow(vFragmentPositionLightspacePositiveZ, uShadowmapPositiveZ) ||
+        isInShadow(vFragmentPositionLightspaceNegativeZ, uShadowmapNegativeZ)) {
+        return 0.0;
+    }
+    return 1.0;
 }
 
 void main() {
@@ -34,10 +58,10 @@ void main() {
     vec3 fragmentNormal = normalize(vFragmentNormalEye);
 
     // Shadow
-    float shadowFacor =  calculateShadowFactor();
+    float shadowFacor = calculateShadowFactor();
 
     // Diffuse Lighting, Specular Lighting
-    float diffuseFactor = max(dot(fragmentNormal, fragmentLightDirection), 0.0) * (1.0 - shadowFacor);
+    float diffuseFactor = max(dot(fragmentNormal, fragmentLightDirection), 0.0) * shadowFacor;
     vec3 diffuseColor = vec3(0, 0, 0);
     vec3 specularColor = vec3(0, 0, 0);
 

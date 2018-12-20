@@ -10,12 +10,20 @@ uniform mat3 uNormalMatrix;
 varying vec3 vFragmentPositionEye;
 varying vec3 vFragmentNormalEye;
 
-uniform mat4 uLightSpaceMatrix;
-varying vec4 vFragmentPositionLightspace;
+uniform mat4 uLightSpaceMatrixPositiveX;
+uniform mat4 uLightSpaceMatrixNegativeX;
+uniform mat4 uLightSpaceMatrixPositiveZ;
+uniform mat4 uLightSpaceMatrixNegativeZ;
+
+varying vec4 vFragmentPositionLightspacePositiveX;
+varying vec4 vFragmentPositionLightspaceNegativeX;
+varying vec4 vFragmentPositionLightspacePositiveZ;
+varying vec4 vFragmentPositionLightspaceNegativeZ;
 
 void main() {
 
-    vec4 positionEye4 = uModelViewMatrix * vec4(aVertexPosition, 1.0);
+    vec4 vertexPosition4 =  vec4(aVertexPosition, 1.0);
+    vec4 positionEye4 = uModelViewMatrix * vertexPosition4;
 
     gl_Position = uProjectionMatrix * positionEye4;
     vFragmentTextureCoordinate = aVertexTextureCoordinate;
@@ -25,6 +33,8 @@ void main() {
     vFragmentNormalEye = normalize(uNormalMatrix * aVertexNormal);
 
     // Shadows
-    vec4 positionLightspace4 = uLightSpaceMatrix * vec4(aVertexPosition, 1.0);
-    vFragmentPositionLightspace = positionLightspace4; //positionLightspace4.xyz / positionLightspace4.w;
+    vFragmentPositionLightspacePositiveX = uLightSpaceMatrixPositiveX * vertexPosition4;
+    vFragmentPositionLightspaceNegativeX = uLightSpaceMatrixNegativeX * vertexPosition4;
+    vFragmentPositionLightspacePositiveZ = uLightSpaceMatrixPositiveZ * vertexPosition4;
+    vFragmentPositionLightspaceNegativeZ = uLightSpaceMatrixNegativeZ * vertexPosition4;
 }

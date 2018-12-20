@@ -24,15 +24,15 @@ function RenderingShadowmap(gl, buffers, mapWidth, mapHeight, lightProjectionVie
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.DEPTH_COMPONENT, this.mapWidth, this.mapHeight, 0,
             this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_INT, null);
 
-        // todo needed?
-        this.colorTexture = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, this.colorTexture);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.mapWidth, this.mapHeight, 0,
-            this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
+        // // todo needed?
+        // this.colorTexture = this.gl.createTexture();
+        // this.gl.bindTexture(this.gl.TEXTURE_2D, this.colorTexture);
+        // this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        // this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        // this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        // this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        // this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.mapWidth, this.mapHeight, 0,
+        //     this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
     };
 
     const createFrameBuffer = () => {
@@ -42,8 +42,8 @@ function RenderingShadowmap(gl, buffers, mapWidth, mapHeight, lightProjectionVie
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT,
             this.gl.TEXTURE_2D, this.shadowmap, 0);
 
-        this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0,
-            this.gl.TEXTURE_2D, this.colorTexture, 0);
+        // this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0,
+        //     this.gl.TEXTURE_2D, this.colorTexture, 0);
 
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
     };
