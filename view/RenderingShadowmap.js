@@ -9,11 +9,9 @@ function RenderingShadowmap(gl, buffers, mapWidth, mapHeight, lightProjectionVie
 
         this.aVertexPositionId = this.gl.getAttribLocation(this.shaderProgram, "aVertexPosition");
         this.uLightSpaceMatrixId = this.gl.getUniformLocation(this.shaderProgram, "uLightSpaceMatrix");
-
-        // this.uShadowmapId = this.gl.getUniformLocation(this.shaderProgram, "uShadowmap"); // todo use it for shadowmap
     };
 
-    // todo check if parameters are correct
+    // todo check if there are better parameters
     const createShadowmapTexture = () => {
         this.shadowmap = this.gl.createTexture();
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.shadowmap);
@@ -23,16 +21,6 @@ function RenderingShadowmap(gl, buffers, mapWidth, mapHeight, lightProjectionVie
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.DEPTH_COMPONENT, this.mapWidth, this.mapHeight, 0,
             this.gl.DEPTH_COMPONENT, this.gl.UNSIGNED_INT, null);
-
-        // // todo needed?
-        // this.colorTexture = this.gl.createTexture();
-        // this.gl.bindTexture(this.gl.TEXTURE_2D, this.colorTexture);
-        // this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        // this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
-        // this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
-        // this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        // this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.mapWidth, this.mapHeight, 0,
-        //     this.gl.RGBA, this.gl.UNSIGNED_BYTE, null);
     };
 
     const createFrameBuffer = () => {
@@ -41,9 +29,6 @@ function RenderingShadowmap(gl, buffers, mapWidth, mapHeight, lightProjectionVie
 
         this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.DEPTH_ATTACHMENT,
             this.gl.TEXTURE_2D, this.shadowmap, 0);
-
-        // this.gl.framebufferTexture2D(this.gl.FRAMEBUFFER, this.gl.COLOR_ATTACHMENT0,
-        //     this.gl.TEXTURE_2D, this.colorTexture, 0);
 
         this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
     };
@@ -61,8 +46,6 @@ function RenderingShadowmap(gl, buffers, mapWidth, mapHeight, lightProjectionVie
 RenderingShadowmap.prototype.draw = function(modelMatrix, clearFramebuffer) {
     this.gl.useProgram(this.shaderProgram);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.frameBuffer);
-    // this.gl.bindTexture(this.gl.TEXTURE_2D, this.shadowmap);
-    // this.gl.bindTexture(this.gl.TEXTURE_2D, this.colorTexture);
 
     if (clearFramebuffer) {
         this.gl.clearColor(1, 1, 1, 1);
@@ -71,11 +54,6 @@ RenderingShadowmap.prototype.draw = function(modelMatrix, clearFramebuffer) {
     }
 
     this.gl.uniformMatrix4fv(this.uLightSpaceMatrixId, false, mat4Multiply(this.lightProjectionViewMatrix, modelMatrix)); //todo change
-
-    // todo realy needed?
-    // this.gl.activeTexture(this.gl.TEXTURE0);
-    // this.gl.bindTexture(this.gl.TEXTURE_2D, this.shadowmap);
-    // this.gl.uniform1i(this.uShadowmapId, 0);
 
     this.buffers.drawPosition(this.aVertexPositionId);
     this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
