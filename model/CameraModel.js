@@ -6,12 +6,12 @@ const Z_NEAR = 1;
 const Z_FAR = 100000;
 
 // View
-const INITIAL_POSITION = [0, 0, 2500]; // In world coordinates
-const LOOK_AT = [0, 0, 0]; // In world coordinates
+const INITIAL_POSITION = [4000, 0, 0]; // In world coordinates
+const LOOK_AT = [5000, 0, 0]; // In world coordinates
 const UP = [0, 1, 0]; // In world coordinates
 
 // Camera movement
-const TRANSLATION_SPEED = 2000;
+const TRANSLATION_SPEED = 1000;
 const ROTATION_SPEED = Math.PI / 2;
 
 function CameraModel(aspectWidth, aspectHeight, sunPosition) {

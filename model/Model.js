@@ -2,7 +2,7 @@
 
 // Sun
 const SUN_RADIUS = 500;
-const SUN_ROTATION_SPEED = 2*Math.PI / (60*20);
+const SUN_ROTATION_SPEED = 2*Math.PI / (60*15);
 const SUN_ROTATION_AXIS = [0, 1, 0];
 const SUN_POSITION_FROM_ORIGIN = [0, 0, 0];
 const SUN_ORBITAL_SPEED = 0;
@@ -52,7 +52,7 @@ const MARS_ORBITAL_AXIS = [0, 1, 0.25];
 const JUPITER_RADIUS = 200;
 const JUPITER_ROTATION_SPEED = 2*Math.PI / (60/5);
 const JUPITER_ROTATION_AXIS = [0, 1, 0];
-const JUPITER_POSITION_FROM_SUN = [0, 0, 20000];
+const JUPITER_POSITION_FROM_SUN = [-20000, 0, 0];
 const JUPITER_ORBITAL_SPEED = 2*Math.PI / (60*20);
 const JUPITER_ORBITAL_AXIS = [0, 1, 0];
 
@@ -129,20 +129,30 @@ function Model(aspectWidth, aspectHeight) {
     );
 
     this.camera = new CameraModel(aspectWidth, aspectHeight, this.sun.position);
+    this.runtimeMultiplyer = 1.0;
 }
 
-Model.prototype.update = function (runtime, keysPressed) {
-    this.sun.rotateAroundOwnAxis(runtime);
-    this.mercury.orbit(runtime);
-    this.mercury.rotateAroundOwnAxis(runtime);
-    this.venus.orbit(runtime);
-    this.venus.rotateAroundOwnAxis(runtime);
-    this.earth.orbit(runtime);
-    this.earth.rotateAroundOwnAxis(runtime);
-    this.earthMoon.orbit(runtime);
-    this.mars.orbit(runtime);
-    this.mars.rotateAroundOwnAxis(runtime);
-    this.jupiter.orbit(runtime);
-    this.jupiter.rotateAroundOwnAxis(runtime);
-    this.camera.updateView(runtime, keysPressed, this.sun.position);
+Model.prototype.update = function (baseRuntime, keysPressed) {
+    if (keysPressed[SPEED_UP] === 1) {
+        this.runtimeMultiplyer *= 2;
+    }
+    if (keysPressed[SLOW_DOWN] === 1) {
+        this.runtimeMultiplyer /= 2;
+    }
+    if (keysPressed[PAUSE] === 0) {
+        const runtime = baseRuntime * this.runtimeMultiplyer;
+        this.sun.rotateAroundOwnAxis(runtime);
+        this.mercury.orbit(runtime);
+        this.mercury.rotateAroundOwnAxis(runtime);
+        this.venus.orbit(runtime);
+        this.venus.rotateAroundOwnAxis(runtime);
+        this.earth.orbit(runtime);
+        this.earth.rotateAroundOwnAxis(runtime);
+        this.earthMoon.orbit(runtime);
+        this.mars.orbit(runtime);
+        this.mars.rotateAroundOwnAxis(runtime);
+        this.jupiter.orbit(runtime);
+        this.jupiter.rotateAroundOwnAxis(runtime);
+    }
+    this.camera.updateView(baseRuntime, keysPressed, this.sun.position);
 };
