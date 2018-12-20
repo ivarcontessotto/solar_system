@@ -10,18 +10,12 @@ uniform mat3 uNormalMatrix;
 varying vec3 vFragmentPositionEye;
 varying vec3 vFragmentNormalEye;
 
-uniform bool uRenderShadowmap;
-uniform mat4 uModelLightMatrix;
+uniform mat4 uLightSpaceMatrix;
+varying vec4 vFragmentPositionLightspace;
 
 void main() {
 
-    // todo move to shadowmapping shader
-    if (uRenderShadowmap) {
-        gl_Position = uModelLightMatrix * vec4(aVertexPosition, 1);
-        return;
-    }
-
-    vec4 positionEye4 = uModelViewMatrix * vec4(aVertexPosition, 1);
+    vec4 positionEye4 = uModelViewMatrix * vec4(aVertexPosition, 1.0);
 
     gl_Position = uProjectionMatrix * positionEye4;
     vFragmentTextureCoordinate = aVertexTextureCoordinate;
@@ -29,4 +23,8 @@ void main() {
     // Shading
     vFragmentPositionEye = positionEye4.xyz / positionEye4.w;
     vFragmentNormalEye = normalize(uNormalMatrix * aVertexNormal);
+
+    // Shadows
+    vec4 positionLightspace4 = uLightSpaceMatrix * vec4(aVertexPosition, 1.0);
+    vFragmentPositionLightspace = positionLightspace4; //positionLightspace4.xyz / positionLightspace4.w;
 }

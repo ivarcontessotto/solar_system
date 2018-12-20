@@ -1,5 +1,20 @@
 "use strict";
 
+// todo move this
+const SHADOWMAP_RESOLUTION = 2048;
+const LIGHT_VERTICAL_FIELD_OF_VIEW = Math.PI/2;
+const LIGHT_Z_NEAR = 1;
+const LIGHT_Z_FAR = 10000;
+const PROJECTION_MATRIX_LIGHT = mat4CreateProjection(LIGHT_VERTICAL_FIELD_OF_VIEW, SHADOWMAP_RESOLUTION / SHADOWMAP_RESOLUTION, LIGHT_Z_NEAR, LIGHT_Z_FAR);
+
+// View
+const LIGHT_POSITION = [0, 0, 0]; // In world coordinates
+const LIGHT_LOOK_AT = [1, 0, 0]; // In world coordinates
+const LIGHT_UP = [0, 1, 0]; // In world coordinates
+const VIEW_MATRIX_LIGHT = mat4CreateLookAt(LIGHT_POSITION, LIGHT_LOOK_AT, LIGHT_UP);
+
+const LIGHT_PROJECTION_VIEW_MATRIX = mat4Multiply(PROJECTION_MATRIX_LIGHT, VIEW_MATRIX_LIGHT);
+
 // todo Materials
 // Map indexes
 const blackMapIndex = 0;
@@ -106,21 +121,19 @@ function View(canvas, model, callback) {
     this.gl = createGLContext(canvas);
     console.log("MAX TEXTURE IMAGE UNITS: ", this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
     const sphereBuffers = new SphereBuffers(this.gl, 50, 50);
-    this.rendering = new Rendering(this.gl, sphereBuffers, this.model.camera.projectionMatrix);
+    this.renderingShadowmap = new RenderingShadowmap(this.gl, sphereBuffers, SHADOWMAP_RESOLUTION, SHADOWMAP_RESOLUTION, LIGHT_PROJECTION_VIEW_MATRIX); // todo get those params
     this.renderingUnlit = new RenderingUnlit(this.gl, sphereBuffers, this.model.camera.projectionMatrix);
+    this.rendering = new Rendering(this.gl, sphereBuffers, this.model.camera.projectionMatrix, LIGHT_PROJECTION_VIEW_MATRIX);
     setUpHiddenSurfaceRemoval(); // todo stays here probably. but lets see what shadow mapping needs
-    this.gl.clearColor(0, 0, 0, 1); // todo might have to move down to draw method. maybe shadow map does not work if it stays here
     // This needs to be done last because images are loaded asynchronously in browser!
     loadTextureImages();
 }
 
 View.prototype.draw = function() {
-    // todo render shadowmap first
+    this.renderingShadowmap.draw(this.model.earth.modelMatrix, true);
+    const shadowmap = this.renderingShadowmap.draw(this.model.earthMoon.modelMatrix, false);
 
-    // todo stays here. maybe have to set different clear colors for shadow map and normal rendering
-    this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
-    // todo stays here but adapt paramerters
-    this.renderingUnlit.draw(this.sunSurface, this.model.sun.modelMatrix, this.model.camera.viewMatrix);
-    this.rendering.draw(this.earthSurface, this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye);
-    this.rendering.draw(this.earthMoonSurface, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye);
+    this.renderingUnlit.draw(this.sunSurface, this.model.sun.modelMatrix, this.model.camera.viewMatrix, true);
+    this.rendering.draw(this.earthSurface, this.model.earth.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmap, false);
+    this.rendering.draw(this.earthMoonSurface, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmap, false);
 };

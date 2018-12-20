@@ -1,6 +1,6 @@
 "use strict";
 
-function Rendering(gl, buffers, projectionMatrix) {
+function Rendering(gl, buffers, projectionMatrix, lightProjectionViewMatrix) {
 
     // todo split into different rendering classes
     const setUpShaderProgram = () => {
@@ -25,24 +25,29 @@ function Rendering(gl, buffers, projectionMatrix) {
         this.uSunPositionEyeId = this.gl.getUniformLocation(this.shaderProgram, "uSunPositionEye");
         this.uSunlightColorId = this.gl.getUniformLocation(this.shaderProgram, "uSunlightColor");
 
-        this.uRenderShadowMapId = this.gl.getUniformLocation(this.shaderProgram, "uRenderShadowMap");
-        this.uModelLightMatrixId = this.gl.getUniformLocation(this.shaderProgram, "uModelLightMatrix");
+        this.uShadowmapId = this.gl.getUniformLocation(this.shaderProgram, "uShadowmap");
+        this.uLightSpaceMatrixId = this.gl.getUniformLocation(this.shaderProgram, "uLightSpaceMatrix");
     };
 
     // todo will not always  be the same for all rendering types
     this.gl = gl;
     this.buffers = buffers;
+    this.lightProjectionViewMatrix = lightProjectionViewMatrix;
     setUpShaderProgram();
     this.gl.uniformMatrix4fv(this.uProjectionMatrixId, false, projectionMatrix);
 }
 
-Rendering.prototype.draw = function(surface, modelMatrix, viewMatrix, sunPositionEye) {
+Rendering.prototype.draw = function(surface, modelMatrix, viewMatrix, sunPositionEye, shadowmap, clearFramebuffer) {
 
     // todo split different rendering methods to its own classes
 
     this.gl.useProgram(this.shaderProgram);
 
-    this.gl.uniform1i(this.uRenderShadowMapId, 0);
+    if (clearFramebuffer) {
+        this.gl.clearColor(0, 0, 0, 1);
+        this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT, true);
+    }
 
     const modelViewMatrix = mat4Multiply(viewMatrix, modelMatrix);
     this.gl.uniformMatrix4fv(this.uModelViewMatrixId, false, modelViewMatrix);
@@ -70,5 +75,11 @@ Rendering.prototype.draw = function(surface, modelMatrix, viewMatrix, sunPositio
     this.gl.uniform3fv(this.uSunlightColorId,[1, 1, 1]);
     this.gl.uniformMatrix3fv(this.uNormalMatrixId, false, mat3NormalMatrixFromMat4(modelViewMatrix));
 
-    this.buffers.drawWithNormals(this.aVertexPositionId, this.aTextureCoordinateId, this.aVertexNormalId);
+    this.gl.activeTexture(this.gl.TEXTURE0 + 4);
+    this.gl.bindTexture(this.gl.TEXTURE_2D, shadowmap);
+    this.gl.uniform1i(this.uShadowmapId, 4);
+
+    this.gl.uniformMatrix4fv(this.uLightSpaceMatrixId, false, mat4Multiply(this.lightProjectionViewMatrix, modelMatrix));
+
+    this.buffers.drawAll(this.aVertexPositionId, this.aTextureCoordinateId, this.aVertexNormalId);
 };

@@ -14,14 +14,18 @@ uniform vec3 uSunPositionEye;
 varying vec3 vFragmentPositionEye;
 varying vec3 vFragmentNormalEye;
 
-uniform bool uRenderShadowmap;
+uniform sampler2D uShadowmap;
+varying vec4 vFragmentPositionLightspace;
+
+float calculateShadowFactor() {
+    vec3 coordinates = vFragmentPositionLightspace.xyz / vFragmentPositionLightspace.w;
+    coordinates = coordinates * 0.5 + 0.5;
+    float closestDepth = texture2D(uShadowmap, coordinates.xy).r;
+    float currentDepth = coordinates.z;
+    return currentDepth - 0.0001 > closestDepth ? 1.0 : 0.0;
+}
 
 void main() {
-
-    // todo move to shadowmapping shader
-    if(uRenderShadowmap) {
-        return;
-    }
 
     vec3 baseCloudColor = texture2D(uCloudMap, vFragmentTextureCoordinate).rgb;
     vec3 baseDiffuseColor = texture2D(uDiffuseMap, vFragmentTextureCoordinate).rgb + uCloudStrength[0] * baseCloudColor;
@@ -29,8 +33,11 @@ void main() {
     vec3 fragmentLightDirection = normalize(uSunPositionEye - vFragmentPositionEye);
     vec3 fragmentNormal = normalize(vFragmentNormalEye);
 
+    // Shadow
+    float shadowFacor =  calculateShadowFactor();
+
     // Diffuse Lighting, Specular Lighting
-    float diffuseFactor = max(dot(fragmentNormal, fragmentLightDirection), 0.0);
+    float diffuseFactor = max(dot(fragmentNormal, fragmentLightDirection), 0.0) * (1.0 - shadowFacor);
     vec3 diffuseColor = vec3(0, 0, 0);
     vec3 specularColor = vec3(0, 0, 0);
 

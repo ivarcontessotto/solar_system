@@ -76,28 +76,28 @@ function SphereBuffers(gl, sectorCount, stackCount) {
     this.numberOfTriangles = (stackCount - 1) * sectorCount * 2;
 }
 
-SphereBuffers.prototype.drawWithNormals = function(aVertexPositionId, aTextureCoordinateId, aVertexNormalId) {
-
+SphereBuffers.prototype.drawAll = function(aVertexPositionId, aTextureCoordinateId, aVertexNormalId) {
     enableAttribute(this.gl, this.vertexPositionBuffer, aVertexPositionId, 3);
     enableAttribute(this.gl, this.textureCoordinateBuffer, aTextureCoordinateId, 2);
     enableAttribute(this.gl, this.vertexNormalBuffer, aVertexNormalId, 3);
-
     drawElements(this.gl, this.indexBuffer, this.numberOfTriangles * 3);
-
     this.gl.disableVertexAttribArray(aVertexPositionId);
     this.gl.disableVertexAttribArray(aTextureCoordinateId);
     this.gl.disableVertexAttribArray(aVertexNormalId);
 };
 
-SphereBuffers.prototype.drawWithoutNormals = function(aVertexPositionId, aTextureCoordinateId) {
-
+SphereBuffers.prototype.drawPositionAndTexture = function(aVertexPositionId, aTextureCoordinateId) {
     enableAttribute(this.gl, this.vertexPositionBuffer, aVertexPositionId, 3);
     enableAttribute(this.gl, this.textureCoordinateBuffer, aTextureCoordinateId, 2);
-
     drawElements(this.gl, this.indexBuffer, this.numberOfTriangles * 3);
-
     this.gl.disableVertexAttribArray(aVertexPositionId);
     this.gl.disableVertexAttribArray(aTextureCoordinateId);
+};
+
+SphereBuffers.prototype.drawPosition = function(aVertexPositionId) {
+    enableAttribute(this.gl, this.vertexPositionBuffer, aVertexPositionId, 3);
+    drawElements(this.gl, this.indexBuffer, this.numberOfTriangles * 3);
+    this.gl.disableVertexAttribArray(aVertexPositionId);
 };
 
 function enableAttribute(gl, attributeBuffer, attributeId, size) {
