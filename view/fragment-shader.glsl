@@ -26,10 +26,12 @@ varying vec4 vFragmentPositionLightspaceNegativeZ;
 
 
 bool isInShadow(vec4 fragmentPositionLightspace, sampler2D shadowMap) {
+    // Clipping
     vec3 mapCoordinates = fragmentPositionLightspace.xyz / fragmentPositionLightspace.w;
     if (any(greaterThan(abs(mapCoordinates), vec3(1.0)))) {
         return false;
     }
+    // Check if in shadow
     mapCoordinates = mapCoordinates * 0.5 + 0.5;
     float closestDepth = texture2D(shadowMap, mapCoordinates.xy).r;
     float currentDepth = mapCoordinates.z;
