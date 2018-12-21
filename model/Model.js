@@ -44,17 +44,49 @@ const EARTHMOON_ORBITAL_AXIS = [0, 1, 0.2];
 const MARS_RADIUS = 40;
 const MARS_ROTATION_SPEED = 2*Math.PI / (60/5);
 const MARS_ROTATION_AXIS = [0, 1, 0];
-const MARS_POSITION_FROM_SUN = [0, 0, 7000];
+const MARS_POSITION_FROM_SUN = [0, 0, 6000];
 const MARS_ORBITAL_SPEED = 2*Math.PI / (60*12);
 const MARS_ORBITAL_AXIS = [0, 1, 0.25];
 
 // Jupiter
 const JUPITER_RADIUS = 200;
-const JUPITER_ROTATION_SPEED = 2*Math.PI / (60/5);
+const JUPITER_ROTATION_SPEED = 2*Math.PI / (60/2);
 const JUPITER_ROTATION_AXIS = [0, 1, 0];
-const JUPITER_POSITION_FROM_SUN = [-20000, 0, 0];
+const JUPITER_POSITION_FROM_SUN = [-15000, 0, 0];
 const JUPITER_ORBITAL_SPEED = 2*Math.PI / (60*20);
 const JUPITER_ORBITAL_AXIS = [0, 1, 0];
+
+// Jupyter Moon 01
+const JUPITERMOON_01_RADIUS = 10;
+const JUPITERMOON_01_ROTATION_SPEED = 0;
+const JUPITERMOON_01_ROTATION_AXIS = [0, 1, 0];
+const JUPITERMOON_01_POSITION_FROM_JUPITER = [300, 0, 0];
+const JUPITERMOON_01_ORBITAL_SPEED = 2*Math.PI / (60/4);
+const JUPITERMOON_01_ORBITAL_AXIS = [0, 1, 0.1];
+
+// Jupyter Moon 02
+const JUPITERMOON_02_RADIUS = 20;
+const JUPITERMOON_02_ROTATION_SPEED = 0;
+const JUPITERMOON_02_ROTATION_AXIS = [0, 1, 0];
+const JUPITERMOON_02_POSITION_FROM_JUPITER = [-400, 0, 0];
+const JUPITERMOON_02_ORBITAL_SPEED = 2*Math.PI / (60/3);
+const JUPITERMOON_02_ORBITAL_AXIS = [0, 1, 0.2];
+
+// Jupyter Moon 03
+const JUPITERMOON_03_RADIUS = 30;
+const JUPITERMOON_03_ROTATION_SPEED = 0;
+const JUPITERMOON_03_ROTATION_AXIS = [0, 1, 0];
+const JUPITERMOON_03_POSITION_FROM_JUPITER = [0, 0, 500];
+const JUPITERMOON_03_ORBITAL_SPEED = 2*Math.PI / (60/2);
+const JUPITERMOON_03_ORBITAL_AXIS = [0, 1, -0.1];
+
+// Jupyter Moon 04
+const JUPITERMOON_04_RADIUS = 15;
+const JUPITERMOON_04_ROTATION_SPEED = 0;
+const JUPITERMOON_04_ROTATION_AXIS = [0, 1, 0];
+const JUPITERMOON_04_POSITION_FROM_JUPITER = [0, 0, 600];
+const JUPITERMOON_04_ORBITAL_SPEED = 2*Math.PI / 60;
+const JUPITERMOON_04_ORBITAL_AXIS = [0, 1, -0.2];
 
 function Model(aspectWidth, aspectHeight) {
 
@@ -128,8 +160,48 @@ function Model(aspectWidth, aspectHeight) {
         JUPITER_ORBITAL_AXIS
     );
 
+    this.jupiterMoon01 = new SphereModel(
+        JUPITERMOON_01_RADIUS,
+        JUPITERMOON_01_ROTATION_SPEED,
+        JUPITERMOON_01_ROTATION_AXIS,
+        this.jupiter,
+        JUPITERMOON_01_POSITION_FROM_JUPITER,
+        JUPITERMOON_01_ORBITAL_SPEED,
+        JUPITERMOON_01_ORBITAL_AXIS
+    );
+
+    this.jupiterMoon02 = new SphereModel(
+        JUPITERMOON_02_RADIUS,
+        JUPITERMOON_02_ROTATION_SPEED,
+        JUPITERMOON_02_ROTATION_AXIS,
+        this.jupiter,
+        JUPITERMOON_02_POSITION_FROM_JUPITER,
+        JUPITERMOON_02_ORBITAL_SPEED,
+        JUPITERMOON_02_ORBITAL_AXIS
+    );
+
+    this.jupiterMoon03 = new SphereModel(
+        JUPITERMOON_03_RADIUS,
+        JUPITERMOON_03_ROTATION_SPEED,
+        JUPITERMOON_03_ROTATION_AXIS,
+        this.jupiter,
+        JUPITERMOON_03_POSITION_FROM_JUPITER,
+        JUPITERMOON_03_ORBITAL_SPEED,
+        JUPITERMOON_03_ORBITAL_AXIS
+    );
+
+    this.jupiterMoon04 = new SphereModel(
+        JUPITERMOON_04_RADIUS,
+        JUPITERMOON_04_ROTATION_SPEED,
+        JUPITERMOON_04_ROTATION_AXIS,
+        this.jupiter,
+        JUPITERMOON_04_POSITION_FROM_JUPITER,
+        JUPITERMOON_04_ORBITAL_SPEED,
+        JUPITERMOON_04_ORBITAL_AXIS
+    );
+
     this.camera = new CameraModel(aspectWidth, aspectHeight, this.sun.position);
-    this.runtimeMultiplyer = 1.0;
+    this.runtimeMultiplyer = 0.5;
 }
 
 Model.prototype.update = function (baseRuntime, keysPressed) {
@@ -153,6 +225,14 @@ Model.prototype.update = function (baseRuntime, keysPressed) {
         this.mars.rotateAroundOwnAxis(runtime);
         this.jupiter.orbit(runtime);
         this.jupiter.rotateAroundOwnAxis(runtime);
+        this.jupiterMoon01.orbit(runtime);
+        this.jupiterMoon01.rotateAroundOwnAxis(runtime);
+        this.jupiterMoon02.orbit(runtime);
+        this.jupiterMoon02.rotateAroundOwnAxis(runtime);
+        this.jupiterMoon03.orbit(runtime);
+        this.jupiterMoon03.rotateAroundOwnAxis(runtime);
+        this.jupiterMoon04.orbit(runtime);
+        this.jupiterMoon04.rotateAroundOwnAxis(runtime);
     }
     this.camera.updateView(baseRuntime, keysPressed, this.sun.position);
 };

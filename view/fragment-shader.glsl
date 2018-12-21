@@ -35,7 +35,7 @@ bool isInShadow(vec4 fragmentPositionLightspace, sampler2D shadowMap) {
     mapCoordinates = mapCoordinates * 0.5 + 0.5;
     float closestDepth = texture2D(shadowMap, mapCoordinates.xy).r;
     float currentDepth = mapCoordinates.z;
-    if ((currentDepth - 0.0005) > closestDepth) {
+    if ((currentDepth - 0.00001) > closestDepth) {
         return true;
     }
     return false;

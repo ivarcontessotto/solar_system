@@ -4,7 +4,7 @@
 const SHADOWMAP_RESOLUTION = 4096;
 const LIGHT_VERTICAL_FIELD_OF_VIEW = Math.PI/2;
 const LIGHT_Z_NEAR = 500;
-const LIGHT_Z_FAR = 50000;
+const LIGHT_Z_FAR = 100000;
 const PROJECTION_MATRIX_LIGHT = mat4CreateProjection(LIGHT_VERTICAL_FIELD_OF_VIEW, SHADOWMAP_RESOLUTION / SHADOWMAP_RESOLUTION, LIGHT_Z_NEAR, LIGHT_Z_FAR);
 
 // View
@@ -36,9 +36,13 @@ const earthNightMapIndex = 4;
 const earthCloudMapIndex = 5;
 const earthMoonMapIndex = 6;
 const mercuryMapIndex = 7;
-const venusAtmosphereMapIndex = 8;
+const venusMapIndex = 8;
 const marsMapIndex = 9;
 const jupiterMapIndex = 10;
+const jupiterMoon01MapIndex = 11;
+const jupiterMoon02MapIndex = 12;
+const jupiterMoon03MapIndex = 13;
+const jupiterMoon04MapIndex = 14;
 
 // Mercury surface constants
 const mercuryDiffuseStrength = 1;
@@ -77,6 +81,30 @@ const jupiterDiffuseStrength = 1;
 const jupiterSpecularStrength = 0.5;
 const jupiterShininess = 10;
 const jupiterAmbientStrength = 0.1;
+
+// Jupiter Moon 01 surface constants
+const jupiterMoon01DiffuseStrength = 1;
+const jupiterMoon01SpecularStrength = 0.75;
+const jupiterMoon01Shininess = 1;
+const jupiterMoon01AmbientStrength = 0.1;
+
+// Jupiter Moon 02 surface constants
+const jupiterMoon02DiffuseStrength = 1;
+const jupiterMoon02SpecularStrength = 0.75;
+const jupiterMoon02Shininess = 1;
+const jupiterMoon02AmbientStrength = 0.1;
+
+// Jupiter Moon 03 surface constants
+const jupiterMoon03DiffuseStrength = 1;
+const jupiterMoon03SpecularStrength = 0.75;
+const jupiterMoon03Shininess = 1;
+const jupiterMoon03AmbientStrength = 0.1;
+
+// Jupiter Moon 04 surface constants
+const jupiterMoon04DiffuseStrength = 1;
+const jupiterMoon04SpecularStrength = 0.75;
+const jupiterMoon04Shininess = 1;
+const jupiterMoon04AmbientStrength = 0.1;
 
 function View(canvas, model, callback) {
 
@@ -119,9 +147,9 @@ function View(canvas, model, callback) {
             [0, 0]);
 
         this.venusSurface = new SurfaceAttribute(
-            this.textureItems[venusAtmosphereMapIndex].texture,
-            this.textureItems[venusAtmosphereMapIndex].texture,
-            this.textureItems[venusAtmosphereMapIndex].texture,
+            this.textureItems[venusMapIndex].texture,
+            this.textureItems[venusMapIndex].texture,
+            this.textureItems[venusMapIndex].texture,
             [venusDiffuseStrength, venusSpecularStrength, venusShininess, venusAmbientStrength],
             this.textureItems[blackMapIndex].texture,
             [0, 0]);
@@ -157,6 +185,38 @@ function View(canvas, model, callback) {
             [jupiterDiffuseStrength, jupiterSpecularStrength, jupiterShininess, jupiterAmbientStrength],
             this.textureItems[blackMapIndex].texture,
             [0, 0]);
+
+        this.jupiterMoon01Surface = new SurfaceAttribute(
+            this.textureItems[jupiterMoon01MapIndex].texture,
+            this.textureItems[jupiterMoon01MapIndex].texture,
+            this.textureItems[jupiterMoon01MapIndex].texture,
+            [jupiterMoon01DiffuseStrength, jupiterMoon01SpecularStrength, jupiterMoon01Shininess, jupiterMoon01AmbientStrength],
+            this.textureItems[blackMapIndex].texture,
+            [0, 0]);
+
+        this.jupiterMoon02Surface= new SurfaceAttribute(
+            this.textureItems[jupiterMoon02MapIndex].texture,
+            this.textureItems[jupiterMoon02MapIndex].texture,
+            this.textureItems[jupiterMoon02MapIndex].texture,
+            [jupiterMoon02DiffuseStrength, jupiterMoon02SpecularStrength, jupiterMoon02Shininess, jupiterMoon02AmbientStrength],
+            this.textureItems[blackMapIndex].texture,
+            [0, 0]);
+
+        this.jupiterMoon03Surface = new SurfaceAttribute(
+            this.textureItems[jupiterMoon03MapIndex].texture,
+            this.textureItems[jupiterMoon03MapIndex].texture,
+            this.textureItems[jupiterMoon03MapIndex].texture,
+            [jupiterMoon03DiffuseStrength, jupiterMoon03SpecularStrength, jupiterMoon03Shininess, jupiterMoon03AmbientStrength],
+            this.textureItems[blackMapIndex].texture,
+            [0, 0]);
+
+        this.jupiterMoon04Surface = new SurfaceAttribute(
+            this.textureItems[jupiterMoon04MapIndex].texture,
+            this.textureItems[jupiterMoon04MapIndex].texture,
+            this.textureItems[jupiterMoon04MapIndex].texture,
+            [jupiterMoon04DiffuseStrength, jupiterMoon04SpecularStrength, jupiterMoon04Shininess, jupiterMoon04AmbientStrength],
+            this.textureItems[blackMapIndex].texture,
+            [0, 0]);
     };
 
     let imagesToLoad = 0;
@@ -186,9 +246,13 @@ function View(canvas, model, callback) {
         this.textureItems[earthCloudMapIndex] = {url: "images/2k_earth_clouds.jpg"};
         this.textureItems[earthMoonMapIndex] = {url: "images/2k_moon.jpg"};
         this.textureItems[mercuryMapIndex] = {url: "images/2k_mercury.jpg"};
-        this.textureItems[venusAtmosphereMapIndex] = {url: "images/2k_venus_atmosphere.jpg"};
+        this.textureItems[venusMapIndex] = {url: "images/2k_venus_atmosphere.jpg"};
         this.textureItems[marsMapIndex] = {url: "images/2k_mars.jpg"};
         this.textureItems[jupiterMapIndex] = {url: "images/2k_jupiter.jpg"};
+        this.textureItems[jupiterMoon01MapIndex] = {url: "images/2k_ceres_fictional.jpg"};
+        this.textureItems[jupiterMoon02MapIndex] = {url: "images/2k_eris_fictional.jpg"};
+        this.textureItems[jupiterMoon03MapIndex] = {url: "images/2k_haumea_fictional.jpg"};
+        this.textureItems[jupiterMoon04MapIndex] = {url: "images/2k_makemake_fictional.jpg"};
         imagesToLoad = this.textureItems.length;
         this.textureItems.forEach(loadImage);
     };
@@ -217,28 +281,44 @@ View.prototype.draw = function() {
     this.renderingShadowmapPositiveX.draw(this.model.earth.modelMatrix, false);
     this.renderingShadowmapPositiveX.draw(this.model.earthMoon.modelMatrix, false);
     this.renderingShadowmapPositiveX.draw(this.model.mars.modelMatrix, false);
-    shadowmaps[0] = this.renderingShadowmapPositiveX.draw(this.model.jupiter.modelMatrix, false);
+    this.renderingShadowmapPositiveX.draw(this.model.jupiter.modelMatrix, false);
+    this.renderingShadowmapPositiveX.draw(this.model.jupiterMoon01.modelMatrix, false);
+    this.renderingShadowmapPositiveX.draw(this.model.jupiterMoon02.modelMatrix, false);
+    this.renderingShadowmapPositiveX.draw(this.model.jupiterMoon03.modelMatrix, false);
+    shadowmaps[0] = this.renderingShadowmapPositiveX.draw(this.model.jupiterMoon04.modelMatrix, false);
 
     this.renderingShadowmapNegativeX.draw(this.model.mercury.modelMatrix, true);
     this.renderingShadowmapNegativeX.draw(this.model.venus.modelMatrix, true);
     this.renderingShadowmapNegativeX.draw(this.model.earth.modelMatrix, false);
     this.renderingShadowmapNegativeX.draw(this.model.earthMoon.modelMatrix, false);
     this.renderingShadowmapNegativeX.draw(this.model.mars.modelMatrix, false);
-    shadowmaps[1] = this.renderingShadowmapNegativeX.draw(this.model.jupiter.modelMatrix, false);
+    this.renderingShadowmapNegativeX.draw(this.model.jupiter.modelMatrix, false);
+    this.renderingShadowmapNegativeX.draw(this.model.jupiterMoon01.modelMatrix, false);
+    this.renderingShadowmapNegativeX.draw(this.model.jupiterMoon02.modelMatrix, false);
+    this.renderingShadowmapNegativeX.draw(this.model.jupiterMoon03.modelMatrix, false);
+    shadowmaps[1] = this.renderingShadowmapNegativeX.draw(this.model.jupiterMoon04.modelMatrix, false);
 
     this.renderingShadowmapPositiveZ.draw(this.model.mercury.modelMatrix, true);
     this.renderingShadowmapPositiveZ.draw(this.model.venus.modelMatrix, true);
     this.renderingShadowmapPositiveZ.draw(this.model.earth.modelMatrix, false);
     this.renderingShadowmapPositiveZ.draw(this.model.earthMoon.modelMatrix, false);
     this.renderingShadowmapPositiveZ.draw(this.model.mars.modelMatrix, false);
-    shadowmaps[2] = this.renderingShadowmapPositiveZ.draw(this.model.jupiter.modelMatrix, false);
+    this.renderingShadowmapPositiveZ.draw(this.model.jupiter.modelMatrix, false);
+    this.renderingShadowmapPositiveZ.draw(this.model.jupiterMoon01.modelMatrix, false);
+    this.renderingShadowmapPositiveZ.draw(this.model.jupiterMoon02.modelMatrix, false);
+    this.renderingShadowmapPositiveZ.draw(this.model.jupiterMoon03.modelMatrix, false);
+    shadowmaps[2] = this.renderingShadowmapPositiveZ.draw(this.model.jupiterMoon04.modelMatrix, false);
 
     this.renderingShadowmapNegativeZ.draw(this.model.mercury.modelMatrix, true);
     this.renderingShadowmapNegativeZ.draw(this.model.venus.modelMatrix, true);
     this.renderingShadowmapNegativeZ.draw(this.model.earth.modelMatrix, false);
     this.renderingShadowmapNegativeZ.draw(this.model.earthMoon.modelMatrix, false);
     this.renderingShadowmapNegativeZ.draw(this.model.mars.modelMatrix, false);
-    shadowmaps[3] = this.renderingShadowmapNegativeZ.draw(this.model.jupiter.modelMatrix, false);
+    this.renderingShadowmapNegativeZ.draw(this.model.jupiter.modelMatrix, false);
+    this.renderingShadowmapNegativeZ.draw(this.model.jupiterMoon01.modelMatrix, false);
+    this.renderingShadowmapNegativeZ.draw(this.model.jupiterMoon02.modelMatrix, false);
+    this.renderingShadowmapNegativeZ.draw(this.model.jupiterMoon03.modelMatrix, false);
+    shadowmaps[3] = this.renderingShadowmapNegativeZ.draw(this.model.jupiterMoon04.modelMatrix, false);
 
     this.renderingUnlit.draw(this.sunSurface, this.model.sun.modelMatrix, this.model.camera.viewMatrix, true);
     this.rendering.draw(this.mercurySurface, this.model.mercury.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
@@ -247,4 +327,8 @@ View.prototype.draw = function() {
     this.rendering.draw(this.earthMoonSurface, this.model.earthMoon.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
     this.rendering.draw(this.marsSurface, this.model.mars.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
     this.rendering.draw(this.jupiterSurface, this.model.jupiter.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
+    this.rendering.draw(this.jupiterMoon01Surface, this.model.jupiterMoon01.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
+    this.rendering.draw(this.jupiterMoon02Surface, this.model.jupiterMoon02.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
+    this.rendering.draw(this.jupiterMoon03Surface, this.model.jupiterMoon03.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
+    this.rendering.draw(this.jupiterMoon04Surface, this.model.jupiterMoon04.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
 };
