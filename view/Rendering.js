@@ -2,7 +2,7 @@
 
 function Rendering(gl, buffers, projectionMatrix, lightProjectionViewMatrices) {
 
-    // todo split into different rendering classes
+    // todo could be more split into specific classes. not all planets do need so many textures
     const setUpShaderProgram = () => {
         this.shaderProgram = setupProgram(this.gl, "view/vertex-shader.glsl", "view/fragment-shader.glsl");
         this.gl.useProgram(this.shaderProgram);

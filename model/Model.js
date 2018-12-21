@@ -1,5 +1,7 @@
 "use strict";
 
+// todo move this crap somewhere else
+
 // Sun
 const SUN_RADIUS = 500;
 const SUN_ROTATION_SPEED = 2*Math.PI / (60*15);
@@ -90,6 +92,7 @@ const JUPITERMOON_04_ORBITAL_AXIS = [0, 1, -0.2];
 
 function Model(aspectWidth, aspectHeight) {
 
+    // todo move to an initializer component
     this.sun = new SphereModel(
         SUN_RADIUS,
         SUN_ROTATION_SPEED,

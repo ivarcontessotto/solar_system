@@ -108,7 +108,6 @@ const jupiterMoon04AmbientStrength = 0.1;
 
 function View(canvas, model, callback) {
 
-    // todo this may stay here. maybe same for all rendering types. but not sure. lets see how shadow mapping works
     const setUpHiddenSurfaceRemoval = () => {
         // back-face culling
         this.gl.frontFace(this.gl.CCW);
@@ -127,7 +126,7 @@ function View(canvas, model, callback) {
         this.gl.generateMipmap(this.gl.TEXTURE_2D);
     };
 
-    // todo stays here, but use different material classes that fit the specific use
+    // todo use different material classes that fit the specific use
     const initBodySurfaceAttributes = () => {
 
         this.sunSurface = new SurfaceAttribute(
@@ -267,7 +266,7 @@ function View(canvas, model, callback) {
     this.renderingShadowmapNegativeZ = new RenderingShadowmap(this.gl, sphereBuffers, SHADOWMAP_RESOLUTION, SHADOWMAP_RESOLUTION, LIGHT_PROJECTION_VIEW_MATRIX_NEG_Z);
     this.renderingUnlit = new RenderingUnlit(this.gl, sphereBuffers, this.model.camera.projectionMatrix);
     this.rendering = new Rendering(this.gl, sphereBuffers, this.model.camera.projectionMatrix, LIGHT_PROJECTION_VIEW_MATRICES);
-    setUpHiddenSurfaceRemoval(); // todo stays here probably. but lets see what shadow mapping needs
+    setUpHiddenSurfaceRemoval();
     // This needs to be done last because images are loaded asynchronously in browser!
     loadTextureImages();
 }
