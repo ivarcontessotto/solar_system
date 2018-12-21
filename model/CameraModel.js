@@ -3,7 +3,7 @@
 // Projection
 const VERTICAL_FIELD_OF_VIEW = Math.PI/4;
 const Z_NEAR = 1;
-const Z_FAR = 100000;
+const Z_FAR = 210000;
 
 // View
 const INITIAL_POSITION = [0, 0, 5000]; // In world coordinates

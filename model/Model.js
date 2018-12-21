@@ -14,10 +14,11 @@ function Model(aspectWidth, aspectHeight) {
     this.jupiterMoon02 = createJupiterMoon02(this.jupiter);
     this.jupiterMoon03 = createJupiterMoon03(this.jupiter);
     this.jupiterMoon04 = createJupiterMoon04(this.jupiter);
+    this.space = createSpace();
 
     this.sphereModels = [
         this.sun, this.mercury, this.venus, this.earth, this.earthMoon, this.mars, this.jupiter,
-        this.jupiterMoon01, this.jupiterMoon02, this.jupiterMoon03, this.jupiterMoon04
+        this.jupiterMoon01, this.jupiterMoon02, this.jupiterMoon03, this.jupiterMoon04, this.space
     ];
     this.camera = new CameraModel(aspectWidth, aspectHeight, this.sun.position);
     this.runtimeMultiplyer = 0.5;

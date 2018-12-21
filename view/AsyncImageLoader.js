@@ -16,6 +16,7 @@ const JUPITER_MOON_01_MAP = 11;
 const JUPITER_MOON_02_MAP = 12;
 const JUPITER_MOON_03_MAP = 13;
 const JUPITER_MOON_04_MAP = 14;
+const SPACE_MAP = 15;
 
 // Map image Urls
 const BLACK_MAP_URL = "images/2k_black.jpg";
@@ -33,13 +34,14 @@ const JUPITER_MOON_01_MAP_URL = "images/2k_ceres_fictional.jpg";
 const JUPITER_MOON_02_MAP_URL = "images/2k_eris_fictional.jpg";
 const JUPITER_MOON_03_MAP_URL = "images/2k_haumea_fictional.jpg";
 const JUPITER_MOON_04_MAP_URL = "images/2k_makemake_fictional.jpg";
+const SPACE_MAP_URL = "images/8k_stars_milky_way.jpg";
 
 function AsyncImageLoader() {
     this.imageUrls = [
         BLACK_MAP_URL, SUN_MAP_URL, EARTH_DAY_MAP_URL, EARTH_SPECULAR_MAP_URL, EARTH_NIGHT_MAP_URL,
         EARTH_CLOUD_MAP_URL, EARTH_MOON_MAP_URL, MERCURY_MAP_URL, VENUS_MAP_URL, MARS_MAP_URL,
         JUPITER_MAP_URL, JUPITER_MOON_01_MAP_URL, JUPITER_MOON_02_MAP_URL, JUPITER_MOON_03_MAP_URL,
-        JUPITER_MOON_04_MAP_URL
+        JUPITER_MOON_04_MAP_URL, SPACE_MAP_URL
     ];
     this.imagesToLoad = this.imageUrls.length;
     this.images = [];

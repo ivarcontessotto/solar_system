@@ -200,6 +200,14 @@ function View(canvas, model, textureImages) {
             [jupiterMoon04DiffuseStrength, jupiterMoon04SpecularStrength, jupiterMoon04Shininess, jupiterMoon04AmbientStrength],
             this.textureMaps[BLACK_MAP],
             [0, 0]);
+
+        this.spaceSurface = new SurfaceAttribute(
+            this.textureMaps[SPACE_MAP],
+            this.textureMaps[BLACK_MAP],
+            this.textureMaps[BLACK_MAP],
+            [0, 0, 0, 0],
+            this.textureMaps[BLACK_MAP],
+            [0, 0]);
     };
 
     this.gl = createGLContext(canvas);
@@ -219,6 +227,8 @@ function View(canvas, model, textureImages) {
 }
 
 View.prototype.draw = function() {
+    this.gl.enable(this.gl.CULL_FACE);
+
     // Render shadowmap
     const shadowmaps = [];
 
@@ -277,4 +287,7 @@ View.prototype.draw = function() {
     this.rendering.draw(this.jupiterMoon02Surface, this.model.jupiterMoon02.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
     this.rendering.draw(this.jupiterMoon03Surface, this.model.jupiterMoon03.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
     this.rendering.draw(this.jupiterMoon04Surface, this.model.jupiterMoon04.modelMatrix, this.model.camera.viewMatrix, this.model.camera.sunPositionEye, shadowmaps, false);
+
+    this.gl.disable(this.gl.CULL_FACE);
+    this.renderingUnlit.draw(this.spaceSurface, this.model.space.modelMatrix, this.model.camera.viewMatrix, false);
 };

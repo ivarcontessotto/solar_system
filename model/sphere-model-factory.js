@@ -88,6 +88,14 @@ const JUPITERMOON_04_POSITION_FROM_JUPITER = [0, 0, 600];
 const JUPITERMOON_04_ORBITAL_SPEED = 2*Math.PI / 60;
 const JUPITERMOON_04_ORBITAL_AXIS = [0, 1, -0.2];
 
+// Space
+const SPACE_RADIUS = 100000;
+const SPACE_ROTATION_SPEED = 0;
+const SPACE_ROTATION_AXIS = [0, 1, 0];
+const SPACE_POSITION_FROM_ORIGIN = [0, 0, 0];
+const SPACE_ORBITAL_SPEED = 0;
+const SPACE_ORBITAL_AXIS = [0, 1, 0];
+
 function createSun() {
     return new SphereModel(
         SUN_RADIUS,
@@ -220,3 +228,14 @@ function createJupiterMoon04(jupiter) {
     );
 }
 
+function createSpace() {
+    return new SphereModel(
+        SPACE_RADIUS,
+        SPACE_ROTATION_SPEED,
+        SPACE_ROTATION_AXIS,
+        null,
+        SPACE_POSITION_FROM_ORIGIN,
+        SPACE_ORBITAL_SPEED ,
+        SPACE_ORBITAL_AXIS
+    );
+}
