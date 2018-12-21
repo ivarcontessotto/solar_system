@@ -15,10 +15,10 @@ uniform mat4 uLightSpaceMatrixNegativeX;
 uniform mat4 uLightSpaceMatrixPositiveZ;
 uniform mat4 uLightSpaceMatrixNegativeZ;
 
-varying vec4 vFragmentPositionLightspacePositiveX;
-varying vec4 vFragmentPositionLightspaceNegativeX;
-varying vec4 vFragmentPositionLightspacePositiveZ;
-varying vec4 vFragmentPositionLightspaceNegativeZ;
+varying vec3 vFragmentPositionLightspacePositiveX;
+varying vec3 vFragmentPositionLightspaceNegativeX;
+varying vec3 vFragmentPositionLightspacePositiveZ;
+varying vec3 vFragmentPositionLightspaceNegativeZ;
 
 void main() {
 
@@ -33,8 +33,12 @@ void main() {
     vFragmentNormalEye = normalize(uNormalMatrix * aVertexNormal);
 
     // Shadows
-    vFragmentPositionLightspacePositiveX = uLightSpaceMatrixPositiveX * vertexPosition4;
-    vFragmentPositionLightspaceNegativeX = uLightSpaceMatrixNegativeX * vertexPosition4;
-    vFragmentPositionLightspacePositiveZ = uLightSpaceMatrixPositiveZ * vertexPosition4;
-    vFragmentPositionLightspaceNegativeZ = uLightSpaceMatrixNegativeZ * vertexPosition4;
+    vec4 fragmentPositionLightspacePositiveX4 = uLightSpaceMatrixPositiveX * vertexPosition4;
+    vFragmentPositionLightspacePositiveX = fragmentPositionLightspacePositiveX4.xyz / fragmentPositionLightspacePositiveX4.w;
+    vec4 fragmentPositionLightspaceNegativeX4 = uLightSpaceMatrixNegativeX * vertexPosition4;
+    vFragmentPositionLightspaceNegativeX = fragmentPositionLightspaceNegativeX4.xyz / fragmentPositionLightspaceNegativeX4.w;
+    vec4 fragmentPositionLightspacePositiveZ4 = uLightSpaceMatrixPositiveZ * vertexPosition4;
+    vFragmentPositionLightspacePositiveZ = fragmentPositionLightspacePositiveZ4.xyz / fragmentPositionLightspacePositiveZ4.w;
+    vec4 fragmentPositionLightspaceNegativeZ4 = uLightSpaceMatrixNegativeZ * vertexPosition4;
+    vFragmentPositionLightspaceNegativeZ = fragmentPositionLightspaceNegativeZ4.xyz / fragmentPositionLightspaceNegativeZ4.w;
 }

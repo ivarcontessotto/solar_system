@@ -19,15 +19,14 @@ uniform sampler2D uShadowmapNegativeX;
 uniform sampler2D uShadowmapPositiveZ;
 uniform sampler2D uShadowmapNegativeZ;
 
-varying vec4 vFragmentPositionLightspacePositiveX;
-varying vec4 vFragmentPositionLightspaceNegativeX;
-varying vec4 vFragmentPositionLightspacePositiveZ;
-varying vec4 vFragmentPositionLightspaceNegativeZ;
+varying vec3 vFragmentPositionLightspacePositiveX;
+varying vec3 vFragmentPositionLightspaceNegativeX;
+varying vec3 vFragmentPositionLightspacePositiveZ;
+varying vec3 vFragmentPositionLightspaceNegativeZ;
 
 
-bool isInShadow(vec4 fragmentPositionLightspace, sampler2D shadowMap) {
+bool isInShadow(vec3 mapCoordinates, sampler2D shadowMap) {
     // Clipping
-    vec3 mapCoordinates = fragmentPositionLightspace.xyz / fragmentPositionLightspace.w;
     if (any(greaterThan(abs(mapCoordinates), vec3(1.0)))) {
         return false;
     }
