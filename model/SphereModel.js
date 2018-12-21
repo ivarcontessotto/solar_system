@@ -42,7 +42,8 @@ SphereModel.prototype.orbit = function (seconds) {
     if (this.parentBody === null) {
         return;
     }
-    this.lastOrbitAngle = this.orbitalSpeed * seconds;
+    const orbitAngle = this.orbitalSpeed * seconds;
+    this.lastOrbitAngle = orbitAngle;
     if (this.lastOrbitAngle <= 0) {
         return;
     }
@@ -50,7 +51,7 @@ SphereModel.prototype.orbit = function (seconds) {
     this.modelMatrix = mat4RotatePreMul(this.modelMatrix, this.parentBody.lastOrbitAngle, this.parentBody.orbitalAxis);
     // orbit around parent
     this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, vec3MultiplyScalar(this.parentBody.position, -1));
-    this.modelMatrix = mat4RotatePreMul(this.modelMatrix, this.lastOrbitAngle, this.orbitalAxis);
+    this.modelMatrix = mat4RotatePreMul(this.modelMatrix, orbitAngle, this.orbitalAxis);
     this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, this.parentBody.position);
     // update position vector
     this.position = vec3HomogeneousToCartesian(vec4MultiplyMat4([0, 0, 0, 1], this.modelMatrix));

@@ -1,7 +1,7 @@
 "use strict";
 
 // todo move this
-const SHADOWMAP_RESOLUTION = 4096;
+const SHADOWMAP_RESOLUTION = 8192;
 const LIGHT_VERTICAL_FIELD_OF_VIEW = Math.PI/2;
 const LIGHT_Z_NEAR = 500;
 const LIGHT_Z_FAR = 100000;
