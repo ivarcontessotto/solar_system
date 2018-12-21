@@ -27,23 +27,6 @@ const LIGHT_PROJECTION_VIEW_MATRICES = [
 ];
 
 // todo Materials
-// Map indexes
-const blackMapIndex = 0;
-const sunMapIndex = 1;
-const earthDayMapIndex = 2;
-const earthSpecularMapIndex = 3;
-const earthNightMapIndex = 4;
-const earthCloudMapIndex = 5;
-const earthMoonMapIndex = 6;
-const mercuryMapIndex = 7;
-const venusMapIndex = 8;
-const marsMapIndex = 9;
-const jupiterMapIndex = 10;
-const jupiterMoon01MapIndex = 11;
-const jupiterMoon02MapIndex = 12;
-const jupiterMoon03MapIndex = 13;
-const jupiterMoon04MapIndex = 14;
-
 // Mercury surface constants
 const mercuryDiffuseStrength = 1;
 const mercurySpecularStrength = 0.8;
@@ -106,7 +89,17 @@ const jupiterMoon04SpecularStrength = 0.75;
 const jupiterMoon04Shininess = 1;
 const jupiterMoon04AmbientStrength = 0.1;
 
-function View(canvas, model, callback) {
+function View(canvas, model, textureImages) {
+
+    const createTexture = (image, index) => {
+        const textureMap = this.gl.createTexture();
+        this.textureMaps[index] = textureMap;
+        this.gl.bindTexture(this.gl.TEXTURE_2D, textureMap);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE,image);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+    };
 
     const setUpHiddenSurfaceRemoval = () => {
         // back-face culling
@@ -117,148 +110,103 @@ function View(canvas, model, callback) {
         this.gl.enable(this.gl.DEPTH_TEST);
     };
 
-    const createTexture = (item, index) => {
-        item.texture = this.gl.createTexture();
-        this.gl.bindTexture(this.gl.TEXTURE_2D, item.texture);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, item.image);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
-        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR_MIPMAP_NEAREST);
-        this.gl.generateMipmap(this.gl.TEXTURE_2D);
-    };
-
     // todo use different material classes that fit the specific use
     const initBodySurfaceAttributes = () => {
 
         this.sunSurface = new SurfaceAttribute(
-            this.textureItems[sunMapIndex].texture,
-            this.textureItems[blackMapIndex].texture,
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[SUN_MAP],
+            this.textureMaps[BLACK_MAP],
+            this.textureMaps[BLACK_MAP],
             [0, 0, 0, 0],
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[BLACK_MAP],
             [0, 0]);
 
         this.mercurySurface = new SurfaceAttribute(
-            this.textureItems[mercuryMapIndex].texture,
-            this.textureItems[mercuryMapIndex].texture,
-            this.textureItems[mercuryMapIndex].texture,
+            this.textureMaps[MERCURY_MAP],
+            this.textureMaps[MERCURY_MAP],
+            this.textureMaps[MERCURY_MAP],
             [mercuryDiffuseStrength, mercurySpecularStrength, mercuryShininess, mercuryAmbientStrength],
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[BLACK_MAP],
             [0, 0]);
 
         this.venusSurface = new SurfaceAttribute(
-            this.textureItems[venusMapIndex].texture,
-            this.textureItems[venusMapIndex].texture,
-            this.textureItems[venusMapIndex].texture,
+            this.textureMaps[VENUS_MAP],
+            this.textureMaps[VENUS_MAP],
+            this.textureMaps[VENUS_MAP],
             [venusDiffuseStrength, venusSpecularStrength, venusShininess, venusAmbientStrength],
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[BLACK_MAP],
             [0, 0]);
 
         this.earthSurface = new SurfaceAttribute(
-            this.textureItems[earthDayMapIndex].texture,
-            this.textureItems[earthSpecularMapIndex].texture,
-            this.textureItems[earthNightMapIndex].texture,
+            this.textureMaps[EARTH_DAY_MAP],
+            this.textureMaps[EARTH_SPECULAR_MAP],
+            this.textureMaps[EARTH_NIGHT_MAP],
             [earthDiffuseStrength, earthSpecularStrength, earthShininess, earthAmbientStrength],
-            this.textureItems[earthCloudMapIndex].texture,
+            this.textureMaps[EARTH_CLOUD_MAP],
             [earthCloudDiffuseStrength, earthCloudAmbientStrength]);
 
         this.earthMoonSurface = new SurfaceAttribute(
-            this.textureItems[earthMoonMapIndex].texture,
-            this.textureItems[earthMoonMapIndex].texture,
-            this.textureItems[earthMoonMapIndex].texture,
+            this.textureMaps[EARTH_MOON_MAP],
+            this.textureMaps[EARTH_MOON_MAP],
+            this.textureMaps[EARTH_MOON_MAP],
             [earthMoonDiffuseStrength, earthMoonSpecularStrength, earthMoonShininess, earthMoonAmbientStrength],
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[BLACK_MAP],
             [0, 0]);
 
         this.marsSurface = new SurfaceAttribute(
-            this.textureItems[marsMapIndex].texture,
-            this.textureItems[marsMapIndex].texture,
-            this.textureItems[marsMapIndex].texture,
+            this.textureMaps[MARS_MAP],
+            this.textureMaps[MARS_MAP],
+            this.textureMaps[MARS_MAP],
             [marsDiffuseStrength, marsSpecularStrength, marsShininess, marsAmbientStrength],
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[BLACK_MAP],
             [0, 0]);
 
         this.jupiterSurface = new SurfaceAttribute(
-            this.textureItems[jupiterMapIndex].texture,
-            this.textureItems[jupiterMapIndex].texture,
-            this.textureItems[jupiterMapIndex].texture,
+            this.textureMaps[JUPITER_MAP],
+            this.textureMaps[JUPITER_MAP],
+            this.textureMaps[JUPITER_MAP],
             [jupiterDiffuseStrength, jupiterSpecularStrength, jupiterShininess, jupiterAmbientStrength],
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[BLACK_MAP],
             [0, 0]);
 
         this.jupiterMoon01Surface = new SurfaceAttribute(
-            this.textureItems[jupiterMoon01MapIndex].texture,
-            this.textureItems[jupiterMoon01MapIndex].texture,
-            this.textureItems[jupiterMoon01MapIndex].texture,
+            this.textureMaps[JUPITER_MOON_01_MAP],
+            this.textureMaps[JUPITER_MOON_01_MAP],
+            this.textureMaps[JUPITER_MOON_01_MAP],
             [jupiterMoon01DiffuseStrength, jupiterMoon01SpecularStrength, jupiterMoon01Shininess, jupiterMoon01AmbientStrength],
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[BLACK_MAP],
             [0, 0]);
 
         this.jupiterMoon02Surface= new SurfaceAttribute(
-            this.textureItems[jupiterMoon02MapIndex].texture,
-            this.textureItems[jupiterMoon02MapIndex].texture,
-            this.textureItems[jupiterMoon02MapIndex].texture,
+            this.textureMaps[JUPITER_MOON_02_MAP],
+            this.textureMaps[JUPITER_MOON_02_MAP],
+            this.textureMaps[JUPITER_MOON_02_MAP],
             [jupiterMoon02DiffuseStrength, jupiterMoon02SpecularStrength, jupiterMoon02Shininess, jupiterMoon02AmbientStrength],
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[BLACK_MAP],
             [0, 0]);
 
         this.jupiterMoon03Surface = new SurfaceAttribute(
-            this.textureItems[jupiterMoon03MapIndex].texture,
-            this.textureItems[jupiterMoon03MapIndex].texture,
-            this.textureItems[jupiterMoon03MapIndex].texture,
+            this.textureMaps[JUPITER_MOON_03_MAP],
+            this.textureMaps[JUPITER_MOON_03_MAP],
+            this.textureMaps[JUPITER_MOON_03_MAP],
             [jupiterMoon03DiffuseStrength, jupiterMoon03SpecularStrength, jupiterMoon03Shininess, jupiterMoon03AmbientStrength],
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[BLACK_MAP],
             [0, 0]);
 
         this.jupiterMoon04Surface = new SurfaceAttribute(
-            this.textureItems[jupiterMoon04MapIndex].texture,
-            this.textureItems[jupiterMoon04MapIndex].texture,
-            this.textureItems[jupiterMoon04MapIndex].texture,
+            this.textureMaps[JUPITER_MOON_04_MAP],
+            this.textureMaps[JUPITER_MOON_04_MAP],
+            this.textureMaps[JUPITER_MOON_04_MAP],
             [jupiterMoon04DiffuseStrength, jupiterMoon04SpecularStrength, jupiterMoon04Shininess, jupiterMoon04AmbientStrength],
-            this.textureItems[blackMapIndex].texture,
+            this.textureMaps[BLACK_MAP],
             [0, 0]);
     };
 
-    let imagesToLoad = 0;
-
-    const onImageLoad = () => {
-        imagesToLoad--;
-        if (imagesToLoad === 0) {
-            this.textureItems.forEach(createTexture);
-            initBodySurfaceAttributes();
-            callback();
-        }
-    };
-
-    const loadImage = (item, index) => {
-        item.image = new Image();
-        item.image.onload = onImageLoad;
-        item.image.src = item.url;
-    };
-
-    const loadTextureImages = () => {
-        this.textureItems = [];
-        this.textureItems[blackMapIndex] = {url: "images/2k_black.jpg"};
-        this.textureItems[sunMapIndex] = {url: "images/2k_sun.jpg"};
-        this.textureItems[earthDayMapIndex] = {url: "images/2k_earth_daymap.jpg"};
-        this.textureItems[earthSpecularMapIndex] = {url: "images/2k_earth_specular_map.jpg"};
-        this.textureItems[earthNightMapIndex] = {url: "images/2k_earth_nightmap.jpg"};
-        this.textureItems[earthCloudMapIndex] = {url: "images/2k_earth_clouds.jpg"};
-        this.textureItems[earthMoonMapIndex] = {url: "images/2k_moon.jpg"};
-        this.textureItems[mercuryMapIndex] = {url: "images/2k_mercury.jpg"};
-        this.textureItems[venusMapIndex] = {url: "images/2k_venus_atmosphere.jpg"};
-        this.textureItems[marsMapIndex] = {url: "images/2k_mars.jpg"};
-        this.textureItems[jupiterMapIndex] = {url: "images/2k_jupiter.jpg"};
-        this.textureItems[jupiterMoon01MapIndex] = {url: "images/2k_ceres_fictional.jpg"};
-        this.textureItems[jupiterMoon02MapIndex] = {url: "images/2k_eris_fictional.jpg"};
-        this.textureItems[jupiterMoon03MapIndex] = {url: "images/2k_haumea_fictional.jpg"};
-        this.textureItems[jupiterMoon04MapIndex] = {url: "images/2k_makemake_fictional.jpg"};
-        imagesToLoad = this.textureItems.length;
-        this.textureItems.forEach(loadImage);
-    };
-
-    this.model = model;
     this.gl = createGLContext(canvas);
     console.log("MAX TEXTURE IMAGE UNITS: ", this.gl.getParameter(this.gl.MAX_TEXTURE_IMAGE_UNITS));
+    this.model = model;
+    this.textureMaps = [];
+    textureImages.forEach(createTexture);
     const sphereBuffers = new SphereBuffers(this.gl, 50, 50);
     this.renderingShadowmapPositiveX = new RenderingShadowmap(this.gl, sphereBuffers, SHADOWMAP_RESOLUTION, SHADOWMAP_RESOLUTION, LIGHT_PROJECTION_VIEW_MATRIX_POS_X);
     this.renderingShadowmapNegativeX = new RenderingShadowmap(this.gl, sphereBuffers, SHADOWMAP_RESOLUTION, SHADOWMAP_RESOLUTION, LIGHT_PROJECTION_VIEW_MATRIX_NEG_X);
@@ -266,9 +214,8 @@ function View(canvas, model, callback) {
     this.renderingShadowmapNegativeZ = new RenderingShadowmap(this.gl, sphereBuffers, SHADOWMAP_RESOLUTION, SHADOWMAP_RESOLUTION, LIGHT_PROJECTION_VIEW_MATRIX_NEG_Z);
     this.renderingUnlit = new RenderingUnlit(this.gl, sphereBuffers, this.model.camera.projectionMatrix);
     this.rendering = new Rendering(this.gl, sphereBuffers, this.model.camera.projectionMatrix, LIGHT_PROJECTION_VIEW_MATRICES);
+    initBodySurfaceAttributes();
     setUpHiddenSurfaceRemoval();
-    // This needs to be done last because images are loaded asynchronously in browser!
-    loadTextureImages();
 }
 
 View.prototype.draw = function() {

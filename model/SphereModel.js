@@ -33,7 +33,6 @@ SphereModel.prototype.rotateAroundOwnAxis = function(seconds) {
     if (angle <= 0) {
         return;
     }
-
     this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, vec3MultiplyScalar(this.position, -1));
     this.modelMatrix = mat4RotatePreMul(this.modelMatrix, angle, this.rotationAxis);
     this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, this.position);
@@ -43,12 +42,10 @@ SphereModel.prototype.orbit = function (seconds) {
     if (this.parentBody === null) {
         return;
     }
-
     this.lastOrbitAngle = this.orbitalSpeed * seconds;
     if (this.lastOrbitAngle <= 0) {
         return;
     }
-
     // first rotate around origin same as parent to catch UP
     this.modelMatrix = mat4RotatePreMul(this.modelMatrix, this.parentBody.lastOrbitAngle, this.parentBody.orbitalAxis);
     // orbit around parent
