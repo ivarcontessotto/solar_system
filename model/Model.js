@@ -2,6 +2,7 @@
 
 function Model(aspectWidth, aspectHeight) {
 
+     // todo remove all those members and process them as a list(in view also)
     this.sun = createSun();
     this.mercury = createMercury(this.sun);
     this.venus = createVenus(this.sun);
@@ -14,6 +15,10 @@ function Model(aspectWidth, aspectHeight) {
     this.jupiterMoon03 = createJupiterMoon03(this.jupiter);
     this.jupiterMoon04 = createJupiterMoon04(this.jupiter);
 
+    this.sphereModels = [
+        this.sun, this.mercury, this.venus, this.earth, this.earthMoon, this.mars, this.jupiter,
+        this.jupiterMoon01, this.jupiterMoon02, this.jupiterMoon03, this.jupiterMoon04
+    ];
     this.camera = new CameraModel(aspectWidth, aspectHeight, this.sun.position);
     this.runtimeMultiplyer = 0.5;
 }
@@ -27,26 +32,12 @@ Model.prototype.update = function (baseRuntime, keysPressed) {
     }
     if (keysPressed[PAUSE] === 0) {
         const runtime = baseRuntime * this.runtimeMultiplyer;
-        this.sun.rotateAroundOwnAxis(runtime);
-        this.mercury.orbit(runtime);
-        this.mercury.rotateAroundOwnAxis(runtime);
-        this.venus.orbit(runtime);
-        this.venus.rotateAroundOwnAxis(runtime);
-        this.earth.orbit(runtime);
-        this.earth.rotateAroundOwnAxis(runtime);
-        this.earthMoon.orbit(runtime);
-        this.mars.orbit(runtime);
-        this.mars.rotateAroundOwnAxis(runtime);
-        this.jupiter.orbit(runtime);
-        this.jupiter.rotateAroundOwnAxis(runtime);
-        this.jupiterMoon01.orbit(runtime);
-        this.jupiterMoon01.rotateAroundOwnAxis(runtime);
-        this.jupiterMoon02.orbit(runtime);
-        this.jupiterMoon02.rotateAroundOwnAxis(runtime);
-        this.jupiterMoon03.orbit(runtime);
-        this.jupiterMoon03.rotateAroundOwnAxis(runtime);
-        this.jupiterMoon04.orbit(runtime);
-        this.jupiterMoon04.rotateAroundOwnAxis(runtime);
+        this.sphereModels.forEach((sphereModel) => {
+            sphereModel.rotateAroundOwnAxis(runtime);
+        });
+        this.sphereModels.forEach((sphereModel) => {
+            sphereModel.orbit(runtime);
+        });
     }
     this.camera.updateView(baseRuntime, keysPressed, this.sun.position);
 };

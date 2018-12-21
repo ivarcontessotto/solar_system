@@ -60,7 +60,7 @@ const venusAmbientStrength = 0.1;
 const earthDiffuseStrength = 1;
 const earthSpecularStrength = 0.5;
 const earthShininess = 10;
-const earthAmbientStrength = 0.75;
+const earthAmbientStrength = 0.5;
 const earthCloudDiffuseStrength = 1;
 const earthCloudAmbientStrength = 0.1;
 
