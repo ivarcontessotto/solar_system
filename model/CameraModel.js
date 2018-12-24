@@ -11,15 +11,15 @@ const LOOK_AT = [0, 0, 0]; // In world coordinates
 const UP = [0, 1, 0]; // In world coordinates
 
 // Camera movement
-const TRANSLATION_SPEED = 1000;
-const ROTATION_SPEED = Math.PI / 2;
+const TRANSLATION_SPEED = 500;
+const ROTATION_SPEED = Math.PI / 4;
 
 function CameraModel(aspectWidth, aspectHeight, sunPosition) {
 
     const createSunPositionEye = () => {
         this.sunPositionEye = vec3HomogeneousToCartesian(
             vec4MultiplyMat4(
-                vec4CartessianToHomogeneous(sunPosition), this.viewMatrix));
+                vec4CartesianToHomogeneous(sunPosition), this.viewMatrix));
     };
 
     this.projectionMatrix = mat4CreateProjection(VERTICAL_FIELD_OF_VIEW, aspectWidth / aspectHeight, Z_NEAR, Z_FAR);
@@ -32,7 +32,7 @@ CameraModel.prototype.updateView = function (runtime, keysPressed, sunPosition) 
     const updateSunPositionEye = () => {
         this.sunPositionEye = vec3HomogeneousToCartesian(
             vec4MultiplyMat4(
-                vec4CartessianToHomogeneous(sunPosition), this.viewMatrix));
+                vec4CartesianToHomogeneous(sunPosition), this.viewMatrix));
     };
 
     // Move camera forward backward

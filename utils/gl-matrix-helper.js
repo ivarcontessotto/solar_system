@@ -28,7 +28,7 @@ function vec4MultiplyMat4(vector, matrix) {
     return vec4.transformMat4(vec4.create(), vector, matrix);
 }
 
-function vec4CartessianToHomogeneous(cartesian) {
+function vec4CartesianToHomogeneous(cartesian) {
     return vec4.fromValues(cartesian[0], cartesian[1], cartesian[2], 1);
 }
 
