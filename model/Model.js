@@ -21,24 +21,25 @@ function Model(aspectWidth, aspectHeight) {
         this.jupiterMoon01, this.jupiterMoon02, this.jupiterMoon03, this.jupiterMoon04, this.space
     ];
     this.camera = new CameraModel(aspectWidth, aspectHeight, this.sun.position);
-    this.runtimeMultiplyer = 0.5;
+    // this.runtimeMultiplyer = 0.5;
 }
 
-Model.prototype.update = function (baseRuntime, keysPressed) {
-    if (keysPressed[SPEED_UP] === 1) {
-        this.runtimeMultiplyer *= 2;
-    }
-    if (keysPressed[SLOW_DOWN] === 1) {
-        this.runtimeMultiplyer /= 2;
-    }
-    if (keysPressed[PAUSE] === 0) {
-        const runtime = baseRuntime * this.runtimeMultiplyer;
-        this.sphereModels.forEach((sphereModel) => {
-            sphereModel.rotateAroundOwnAxis(runtime);
-        });
-        this.sphereModels.forEach((sphereModel) => {
-            sphereModel.orbit(runtime);
-        });
-    }
-    this.camera.updateView(baseRuntime, keysPressed, this.sun.position);
-};
+// Model.prototype.update = function (baseRuntime, keysPressed) {
+//     if (keysPressed[SPEED_UP] === 1) {
+//         this.runtimeMultiplyer *= 2;
+//     }
+//     if (keysPressed[SLOW_DOWN] === 1) {
+//         this.runtimeMultiplyer /= 2;
+//     }
+//     if (keysPressed[PAUSE] === 0) {
+//         const runtime = baseRuntime * this.runtimeMultiplyer;
+//         this.sphereModels.forEach((sphereModel) => {
+//             sphereModel.rotateAroundOwnAxis(runtime);
+//         });
+//         this.sphereModels.forEach((sphereModel) => {
+//             sphereModel.orbit(runtime);
+//         });
+//     }
+//     this.camera.updateView(baseRuntime, keysPressed, this.sun.position);
+// };
+

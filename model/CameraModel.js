@@ -35,21 +35,21 @@ CameraModel.prototype.updateView = function (runtime, keysPressed, sunPosition) 
                 vec4CartesianToHomogeneous(sunPosition), this.viewMatrix));
     };
 
-    // Move camera forward backward
-    const translationFactor = TRANSLATION_SPEED * runtime;
-    const translationVector = [0, 0, translationFactor * (keysPressed[MOVE_FORWARD] - keysPressed[MOVE_BACKWARD])];
-    this.viewMatrix = mat4TranslatePreMul(this.viewMatrix, translationVector);
-
-    const rotationFactor = ROTATION_SPEED * runtime;
-    // Rotate camera left right
-    let rotationAngle = rotationFactor * (keysPressed[ROTATE_LEFT] - keysPressed[ROTATE_RIGHT]);
-    this.viewMatrix = mat4RotatePreMul(this.viewMatrix, -rotationAngle, [0, 1, 0]);
-    // Roll camera forward backward
-    rotationAngle = rotationFactor * (keysPressed[ROLL_FORWARD] - keysPressed[ROLL_BACKWARD]);
-    this.viewMatrix = mat4RotatePreMul(this.viewMatrix, rotationAngle, [1, 0, 0]);
-    // Roll camera left right
-    rotationAngle = rotationFactor * (keysPressed[ROLL_LEFT] - keysPressed[ROLL_RIGHT]);
-    this.viewMatrix = mat4RotatePreMul(this.viewMatrix, -rotationAngle, [0, 0, 1]);
+    // // Move camera forward backward
+    // const translationFactor = TRANSLATION_SPEED * runtime;
+    // const translationVector = [0, 0, translationFactor * (keysPressed[MOVE_FORWARD] - keysPressed[MOVE_BACKWARD])];
+    // this.viewMatrix = mat4TranslatePreMul(this.viewMatrix, translationVector);
+    //
+    // const rotationFactor = ROTATION_SPEED * runtime;
+    // // Rotate camera left right
+    // let rotationAngle = rotationFactor * (keysPressed[ROTATE_LEFT] - keysPressed[ROTATE_RIGHT]);
+    // this.viewMatrix = mat4RotatePreMul(this.viewMatrix, -rotationAngle, [0, 1, 0]);
+    // // Roll camera forward backward
+    // rotationAngle = rotationFactor * (keysPressed[ROLL_FORWARD] - keysPressed[ROLL_BACKWARD]);
+    // this.viewMatrix = mat4RotatePreMul(this.viewMatrix, rotationAngle, [1, 0, 0]);
+    // // Roll camera left right
+    // rotationAngle = rotationFactor * (keysPressed[ROLL_LEFT] - keysPressed[ROLL_RIGHT]);
+    // this.viewMatrix = mat4RotatePreMul(this.viewMatrix, -rotationAngle, [0, 0, 1]);
 
     updateSunPositionEye();
 };
