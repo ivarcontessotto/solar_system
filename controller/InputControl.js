@@ -15,39 +15,45 @@ function InputControl() {
 
 InputControl.prototype.run = function () {
 
-    const inputHandler = (input, isActive) => {
+    const inputHandler = (input, isDown) => {
         if (input === "w" || input === "W") {
-            this.moveForward = isActive;
+            this.moveForward = isDown;
         }
         else if (input === "s" || input === "S") {
-            this.moveBackward = isActive;
+            this.moveBackward = isDown;
         }
         else if (input === "a" || input === "A") {
-            this.rotateLeft = isActive;
+            this.rotateLeft = isDown;
         }
         else if (input === "d" || input === "D") {
-            this.rotateRight = isActive;
+            this.rotateRight = isDown;
         }
         else if (input === "ArrowUp") {
-            this.rollForward = isActive;
+            this.rollForward = isDown;
         }
         else if (input === "ArrowDown") {
-            this.rollBackward = isActive;
+            this.rollBackward = isDown;
         }
         else if (input === "ArrowLeft") {
-            this.rollLeft = isActive;
+            this.rollLeft = isDown;
         }
         else if (input === "ArrowRight") {
-            this.rollRight = isActive;
+            this.rollRight = isDown;
         }
         else if (input === "p" || input === "P") {
-            this.animationPauseFactor = (this.animationPauseFactor + isActive) % 2;
+            if (!isDown) {
+                this.animationPauseFactor = (this.animationPauseFactor + 1) % 2;
+            }
         }
         else if (input === "+") {
-            this.animationSpeedFactor *= isActive * 2.0;
+            if (!isDown) {
+                this.animationSpeedFactor *= 2.0;
+            }
         }
         else if (input === "-") {
-            this.animationSpeedFactor /= isActive * 2.0;
+            if (!isDown) {
+                this.animationSpeedFactor /= 2.0;
+            }
         }
     };
 
