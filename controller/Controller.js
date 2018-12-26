@@ -9,12 +9,13 @@ function Controller(model, view) {
 
 Controller.prototype.run = function() {
 
-    const seconds = (runtime) => runtime / 1000;
+    const seconds = (milliseconds) => milliseconds / 1000;
 
     const produceFrame = (timeStamp) => {
-        // todo 1. update the model (decide if paused or not, get speed factor from inputControl)
-        this.model.update(seconds(timeStamp - this.startTime), this.activated);
-        // todo 2. update the camera (get translation vector and rotation angles from inputControl)
+        const runtimeSeconds = seconds(timeStamp - this.startTime);
+        this.model.updateAnimatedModels(runtimeSeconds * this.inputControl.getAnimationSpeedFactor());
+        this.model.updateCameraView(runtimeSeconds, this.inputControl.getTranslationFactors(), this.inputControl.getRotationFactors());
+
         this.view.draw();
 
         this.startTime = timeStamp;

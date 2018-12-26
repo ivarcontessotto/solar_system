@@ -28,8 +28,8 @@ function SphereModel(radius, rotationSpeed, rotationAxis, parentModel, relPositi
     createModelMatrix();
 }
 
-SphereModel.prototype.rotateAroundOwnAxis = function(seconds) {
-    const angle = this.roationSpeed * seconds;
+SphereModel.prototype.rotateAroundOwnAxis = function(runtimeSeconds) {
+    const angle = this.roationSpeed * runtimeSeconds;
     if (angle <= 0) {
         return;
     }
@@ -38,11 +38,11 @@ SphereModel.prototype.rotateAroundOwnAxis = function(seconds) {
     this.modelMatrix = mat4TranslatePreMul(this.modelMatrix, this.position);
 };
 
-SphereModel.prototype.orbit = function (seconds) {
+SphereModel.prototype.orbit = function (runtimeSeconds) {
     if (this.parentBody === null) {
         return;
     }
-    const orbitAngle = this.orbitalSpeed * seconds;
+    const orbitAngle = this.orbitalSpeed * runtimeSeconds;
     this.lastOrbitAngle = orbitAngle;
     if (this.lastOrbitAngle <= 0) {
         return;

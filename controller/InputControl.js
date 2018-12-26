@@ -63,18 +63,18 @@ InputControl.prototype.run = function () {
     window.addEventListener('keydown', onKeyDown, false);
 };
 
-InputControl.prototype.getAnimationSpeedFactor = function(runtimeFactor) {
-    return this.animationPauseFactor * this.animationSpeedFactor * runtimeFactor;
+InputControl.prototype.getAnimationSpeedFactor = function() {
+    return this.animationPauseFactor * this.animationSpeedFactor;
 };
 
-InputControl.prototype.getTranslationFactors = function(runtimeFactor) {
-    return [0, 0, (this.moveForward - this.moveBackward) * runtimeFactor];
+InputControl.prototype.getTranslationFactors = function() {
+    return [0, 0, this.moveForward - this.moveBackward];
 };
 
-InputControl.prototype.getRotationFactors = function(runtimeFactor) {
+InputControl.prototype.getRotationFactors = function() {
     return [
-        (this.rollBackward - this.rollForward) * runtimeFactor,
-        (this.rotateLeft - this.rotateRight) * runtimeFactor,
-        (this.rollLeft - this.rollRight) * runtimeFactor
+        (this.rollBackward - this.rollForward),
+        (this.rotateLeft - this.rotateRight),
+        (this.rollLeft - this.rollRight)
     ];
 };
